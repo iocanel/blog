@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>net.iocanel</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../../parent/</relativePath>
+	</parent>
+	<groupId>net.sf.ehcache</groupId>
+	<artifactId>net.iocanel.hibernate.ehcache.integration</artifactId>
+	<version>2.1.0</version>
+	<packaging>bundle</packaging>
+	<name>Prototype :: Bundles :: Hibernate EhCache Integration</name>
+
+	<properties>
+		<export.packages>net.sf.ehcache.*</export.packages>
+		<import.packages>!bitronix.*,!org.hibernate.*,*</import.packages>
+		<private.packages>!*</private.packages>
+		<symbolic.name>${pom.groupId}.${pom.artifactId}</symbolic.name>
+		<embed-dep>*;scope=provided;type=!pom;inline=true</embed-dep>
+		<unpack-bundle>false</unpack-bundle>
+	</properties>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.0.1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<unpackBundle>${unpack.bundle}</unpackBundle>
+					<instructions>
+						<Fragment-Host>org.hibernate.net.iocanel.hibernate.all</Fragment-Host>
+						<Bundle-Name>${artifactId}</Bundle-Name>
+						<Bundle-SymbolicName>${symbolic.name}</Bundle-SymbolicName>
+						<Bundle-Description>${pom.name}</Bundle-Description>
+						<Import-Package>${import.packages}</Import-Package>
+						<Export-Package>${export.packages}</Export-Package>
+						<Private-Package>${private.packages}</Private-Package>
+						<Include-Resource>${include.resources}</Include-Resource>
+						<Embed-Dependency>${embed-dep}</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>

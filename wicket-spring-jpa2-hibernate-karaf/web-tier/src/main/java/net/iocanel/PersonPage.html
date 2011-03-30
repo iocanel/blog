@@ -1,0 +1,42 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd" >
+    <head>  
+        <title>Wicket, Hibernate, JPA2 on Karaf</title>
+    </head>
+    <body>
+		<form wicket:id="personForm">
+			<span wicket:id="feedback"/>
+			<div wicket:id="personListContainer">
+				<table>
+					<thead>
+						Persons List
+					</thead>
+					<tbody>
+						<tr wicket:id="personListView">
+							<td>
+								<span wicket:id="firstName"/>
+							</td>
+							<td>
+								<span wicket:id="lastName"/>
+							</td>
+							<td>
+								<button wicket:id="editPerson">Edit</button>
+							</td>
+							<td>
+								<button wicket:id="deletePerson">Delete</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div wicket:id="personDetailsContainer">
+				<span>First Name</span>
+				<input type="text" wicket:id="firstName"/>
+				<span>Last Name</span>
+				<input type="text" wicket:id="lastName"/>
+				<button wicket:id="save" type="submit" title="Save">Save</button>
+				<button wicket:id="cancel" type="reset" title="Cancel">Cancel</button>
+			</div>
+		</form>
+    </body>
+</html>
