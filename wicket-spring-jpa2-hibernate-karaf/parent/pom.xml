@@ -61,7 +61,7 @@
 		</repository>
 		<repository>
 			<id>JBoss Nexus Repository</id>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<url>https://repository.jboss.org/nexus/content/repositories/deprecated/</url>
 		</repository>
 		<repository>
 			<id>Jboss Maven2 Repository</id>
