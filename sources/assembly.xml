@@ -1,0 +1,36 @@
+<assembly xmlns='http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1'
+		  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+		  xsi:schemaLocation='http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1 http://maven.apache.org/xsd/assembly-1.1.1.xsd'>
+
+	<id>application</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<moduleSets>
+		<moduleSet>
+			<includes>
+				<include>net.iocanel:database-tier</include>
+				<include>net.iocanel:web-tier</include>
+			</includes>
+			<binaries>
+				<unpack>false</unpack>
+				<includeDependencies>false</includeDependencies>
+				<outputDirectory>deploy</outputDirectory>
+				<outputFileNameMapping>${module.artifactId}-${module.version}.${module.extension}</outputFileNameMapping>
+			</binaries>
+		</moduleSet>
+	</moduleSets>
+	<fileSets>
+		<fileSet>
+			<directory>bundles/target/wicket-osgi-deps.dir/deploy</directory>
+			<includes>
+				<include>*.jar</include>
+			</includes>
+			<outputDirectory>deploy</outputDirectory>
+		</fileSet>
+	</fileSets>
+
+</assembly>
