@@ -6,6 +6,7 @@ This is the repository that contains the actual posts and code samples used in m
 
 
 - 05/11/2011: [Cloud Notifications with Apache Camel](https://github.com/iocanel/blog/tree/cloud-notifications-with-apache-camel)
+- 28/02/2011: [Hazelcast on Karaf](https://github.com/iocanel/blog/tree/hazelcast-on-karaf)
 - 12/07/2010: [Wicket, Spring 3, JPA2 & Hibernate OSGi Application on Apache Karaf](https://github.com/iocanel/blog/tree/wicket-spring-3-jpa2-hibernate-osgi-application-on-apache-karaf)
 
 
