@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features>
+
+   <repository>mvn:org.apache.karaf/apache-karaf/${karaf.version}/xml/features</repository>
+
+    <feature name='hazelcast' description='A Hazelcast Instacne' version='${project.version}'>
+         <details>A Hazelcast instance as an OSGi service</details>
+         <feature>spring-dm</feature>
+         <feature>war</feature>
+         <bundle dependency='true'>mvn:com.hazelcast/hazelcast/${hazelcast.version}</bundle>
+         <bundle>mvn:net.iocanel.karaf.hazelcast/instance/${project.version}</bundle>
+        <bundle>mvn:net.iocanel.karaf.hazelcast/shell/${project.version}</bundle>
+         <bundle>war:mvn:com.hazelcast/hazelcast-monitor/${hazelcast.version}/war</bundle>
+        <bundle>war:mvn:com.hazelcast/hazelcast-monitor/${hazelcast.version}/war</bundle>
+     </feature>
+
+</features>
