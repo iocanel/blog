@@ -1,0 +1,206 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "metadata": {
+    "name": "jenkins"
+  },
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "labels": {
+          "component": "jenkins",
+          "provider": "fabric8"
+        },
+        "name": "jenkins"
+      },
+      "spec": {
+        "ports": [
+          {
+            "port": 80,
+            "name": "http",
+            "protocol": "TCP",
+            "targetPort": 8080
+          },
+          {
+            "port": 50000,
+            "name": "slavelistener",
+            "protocol": "TCP",
+            "targetPort": 50000
+          }
+        ],
+        "selector": {
+          "component": "jenkins",
+          "provider": "fabric8"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ReplicationController",
+      "metadata": {
+        "labels": {
+          "component": "jenkins",
+          "provider": "fabric8"
+        },
+        "name": "jenkins"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "component": "jenkins",
+          "provider": "fabric8"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "component": "jenkins",
+              "provider": "fabric8"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "KUBERNETES_NAMESPACE",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.namespace"
+                      }
+                    }
+                  }
+                ],
+                "image": "iocanel/jenkins-swarm-master",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "jenkins",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "name": "http"
+                  },
+                  {
+                    "containerPort": 5000,
+                    "name": "slavelistener"
+                  }
+                ],
+                "securityContext": {
+                  "privileged": true
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/var/run/docker.sock",
+                    "name": "docker-socket",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/home/jenkins/",
+                    "name": "jenkis-home",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "serviceAccount": "fabric8",
+            "volumes": [
+              {
+                "hostPath": {
+                  "path": "/var/run/docker.sock"
+                },
+                "name": "docker-socket"
+              },
+              {
+                "hostPath": {
+                  "path": "/home/jenkins/"
+                },
+                "name": "jenkis-home"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ReplicationController",
+      "metadata": {
+        "labels": {
+          "component": "jenkins-client",
+          "provider": "fabric8"
+        },
+        "name": "jenkins-client"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "component": "jenkins-client",
+          "provider": "fabric8"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "component": "jenkins-client",
+              "provider": "fabric8"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "KUBERNETES_NAMESPACE",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.namespace"
+                      }
+                    }
+                  }
+                ],
+                "image": "iocanel/jenkins-swarm-client-dind",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "jenkins-client",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "name": "http"
+                  }
+                ],
+                "securityContext": {
+                  "privileged": true
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/var/jenkins_home/workspace",
+                    "name": "jenkins-workspace",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/home/jenkins/",
+                    "name": "jenkis-home",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "serviceAccount": "fabric8",
+            "volumes": [
+              {
+                "hostPath": {
+                  "path": "/home/jenkins/"
+                },
+                "name": "jenkis-home"
+              },
+              {
+                "hostPath": {
+                  "path": "/var/jenkins_home/workspace"
+                },
+                "name": "jenkins-workspace"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
