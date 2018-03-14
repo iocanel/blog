@@ -7,6 +7,7 @@ But of course, this takes time....
 
 ## Posts
 
+- 29/09/2017: [Using itit container to handle Openshift's arbitrary user ids](https://github.com/iocanel/blog/tree/using-init-containers-to-handle-openshifts-arbitrary-user-ids)
 - 04/09/2015: [Jenkins setups for Kubernetes and Docker Workflow](https://github.com/iocanel/blog/tree/jenkins-setups-for-kubernetes-and-docker-workflow)
 - 05/11/2011: [Cloud Notifications with Apache Camel](https://github.com/iocanel/blog/tree/cloud-notifications-with-apache-camel)
 - 28/02/2011: [Hazelcast on Karaf](https://github.com/iocanel/blog/tree/hazelcast-on-karaf)
