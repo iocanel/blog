@@ -7,6 +7,7 @@ But of course, this takes time....
 
 ## Posts
 
+- 21/06/2018: [Language Server Protocol, Java and Emacs](https://github.com/iocanel/blog/tree/language-server-protocol-java-and-emacs)
 - 29/09/2017: [Using itit container to handle Openshift's arbitrary user ids](https://github.com/iocanel/blog/tree/using-init-containers-to-handle-openshifts-arbitrary-user-ids)
 - 04/09/2015: [Jenkins setups for Kubernetes and Docker Workflow](https://github.com/iocanel/blog/tree/jenkins-setups-for-kubernetes-and-docker-workflow)
 - 05/11/2011: [Cloud Notifications with Apache Camel](https://github.com/iocanel/blog/tree/cloud-notifications-with-apache-camel)
