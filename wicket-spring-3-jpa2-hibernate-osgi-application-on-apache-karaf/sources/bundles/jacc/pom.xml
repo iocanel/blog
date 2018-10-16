@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>net.iocanel</groupId>
+        <version>1.0-SNAPSHOT</version>
+		<relativePath>../../parent/</relativePath>
+    </parent>
+    
+    <groupId>javax.security</groupId>
+    <artifactId>net.iocanel.jacc</artifactId>
+    <version>1.0</version>
+    <packaging>bundle</packaging>
+    <name>Prototype :: Bundles :: Jacc</name>
+
+    <properties>
+        <export.packages>javax.security.jacc;version=1.0</export.packages>
+        <import.packages>*</import.packages>
+        <private.packages>!*</private.packages>
+        <symbolic.name>${pom.groupId}.${pom.artifactId}</symbolic.name>
+        <embed-dep>*;scope=provided;type=!pom;inline=true</embed-dep>
+        <unpack-bundle>false</unpack-bundle>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jacc</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.0.1</version>
+                <extensions>true</extensions>
+
+                <configuration>
+                    <unpackBundle>${unpack.bundle}</unpackBundle>
+                    <instructions>
+                        <Bundle-Name>${artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${symbolic.name}</Bundle-SymbolicName>
+                        <Bundle-Description>${pom.name}</Bundle-Description>
+                        <Import-Package>${import.packages}</Import-Package>
+                        <Private-Package>${private.packages}</Private-Package>
+                        <Include-Resource>${include.resources}</Include-Resource>
+                        <Embed-Dependency>${embed-dep}</Embed-Dependency>
+                        <_exportcontents>${export.packages}</_exportcontents>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
