@@ -7,6 +7,7 @@ But of course, this takes time....
 
 ## Posts
 
+- 25/10/2018: [Micronaut pt.1: Introduction](https://github.com/iocanel/blog/blob/master/micronaut-pt1-introduction)
 - 16/10/2018: [A quick look at sdkman](https://github.com/iocanel/blog/blob/master/sdkman)
 - 13/09/2018: [Service Catalog pt. 2: Connector](https://github.com/iocanel/blog/blob/master/service-catalog-pt2-connector)
 - 12/09/2018: [Service Catalog pt. 1: Introduction](https://github.com/iocanel/blog/blob/master/service-catalog-pt1-introduction)
