@@ -47,7 +47,7 @@
 		<antlr-version>2.7.7</antlr-version>
 		<ant-tools-version>1.7.1</ant-tools-version>
 		<!-- Testing Properties -->
-		<junit-version>4.8.1</junit-version>
+		<junit-version>4.13.1</junit-version>
 	</properties>
 
 	<repositories>
