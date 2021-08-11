@@ -1,4 +1,7 @@
 #+BLOG: iocanel.com
+#+POSTID: 689
+#+DATE: [2021-08-11 Wed 22:46]
+#+BLOG: iocanel.com
 #+ORG2BLOG:
 #+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
 #+TITLE: Hackers guide to Jiu Jitsu
@@ -60,13 +63,13 @@ You may find one or more of the questions below relatable:
   - Video was in a DVD ?
 - How many times you took a great note, that was then forgotten ?
   - Lost ?
-  - Never reviewd the note ?
+  - Never reviewed the note ?
 - Is it hard for you to retain the information you learn ?
 - Have you ever felt that you need a more compact representation of knowledge than the original raw material ?
 
 ** Influences
    
-   [[https://en.wikipedia.org/wiki/John_Danaher_(martial_artist)][John Danaher]] is arguably one of the biggest influnces in modern jiu jitsu. Danaher is a Jiu Jitsu and MMA coach but also a Phd in Philosophy.
+   [[https://en.wikipedia.org/wiki/John_Danaher_(martial_artist)][John Danaher]] is arguably one of the biggest influnces in modern Jiu Jitsu. Danaher is a Jiu Jitsu and MMA coach but also a Phd in Philosophy.
    I think that what makes him stand out, is his background in Philosophy, which he sucesfully applied to the sport giving him a unique perspective.
 
    Influnced by Danaher, I cannot stop but thinking `How could I apply my unique skills in perspective to gain an agnle in the sport?`.
@@ -78,7 +81,8 @@ You may find one or more of the questions below relatable:
 * Format and topics
 
   The first parts of the series will include short posts related to video processing / playback tools and how the can be used to make the most out of instuctionals.
-  Then I am going to focus on note taking and how to make the most out of your notes and we'll see how it goes.
+  Then I am going to focus on note taking.
+  Then I am going to demonstrate how to integrate everything together and we'll see how it goes.
 
   All the tools I am going to use are going to be free and opensource tools available in all three major operation systems (Windows, OSX and Linux).
 
@@ -89,12 +93,11 @@ You may find one or more of the questions below relatable:
   - [[https://github.com/tesseract-ocr/tesseract][tesseract]]
   - [[https://www.gnu.org/software/emacs/][emacs]] 
 
- Feel free to drop a comment with requests, suggestions and feedback! 
-  
-  
+ Feel free to drop a comment with requests, suggestions and feedback!
 
+* Post index
 
+- 01. Hackers guide to Jiu Jitsu: into [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-into][wordpress verison]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
 
-
-
-  
+# ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/08/hackers-guide-to-jiu-jitsu-3.png
