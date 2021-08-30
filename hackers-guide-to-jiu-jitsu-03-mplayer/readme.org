@@ -1,4 +1,7 @@
 #+BLOG: iocanel.com
+#+POSTID: 711
+#+DATE: [2021-08-30 Mon 21:48]
+#+BLOG: iocanel.com
 #+BLOG: iocanel.com
 #+ORG2BLOG:
 #+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
@@ -248,6 +251,8 @@ Future posts in the series will focus on the note taking part which in my opinio
 
 * Post index
 
-- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-intro][wordpress verison]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
 - 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
 - 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
+
+# ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/08/hackers-guide-to-jiu-jitsu-5.png

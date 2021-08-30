@@ -109,8 +109,7 @@ There are many things you can do with this timestamp. Below are some examples:
 
 The script below will attempt to detect chapters and split the long video accordingly.
 
-#+begin_src sh :tangle ~/bin/split-video-by-chapter.sh
-  #!/bin/bash
+#+begin_src sh :tangle ~/bin/split-video-by-chapter.sh  :shebang #!/bin/bash
   VIDEO=$1
   EXTENSION="${VIDEO##*.}"
   FRAMERATE=5
@@ -159,19 +158,17 @@ Here's an example an animated image that is demonstrating the `pumping method` f
 [[./The pumping method grip break.gif]]
   
 
-#+begin_src sh :tangle ~/bin/create-animated-gif.sh
-  #!/bin/bash
+#+begin_src sh :tangle ~/bin/create-animated-gif.sh :shebang #!/bin/bash
   VIDEO=$1
-  begin=${2:-"00:00:00"}
-  end=${3:-"00:01:00"}
+  BEGINNING=${2:-"00:00:00"}
+  END=${3:-"00:01:00"}
   FRAMERATE=${4:-5}    
   SCALE=${5:-"512:-1"}    
   
-  BASE_NAME=$(basename -- "$VIDEO"}
-  NAME="${filename%.*}"
+  NAME="${VIDEO%.*}"
   EXTENSION="${VIDEO##*.}"
   
-  ffmpeg -y -i $1 -r $FRAMERATE -scale $SCALE -ss $begin -to $end $NAME.gif < /dev/null 2> /dev/null
+  ffmpeg -y -i "$VIDEO" -r $FRAMERATE -vf scale=$SCALE -ss $BEGINNING -to $END $NAME.gif < /dev/null 2> /dev/null
   done
 #+end_src
 
@@ -193,8 +190,9 @@ Sometimes you just want to extract a single image instead of an animated gif. Th
 
 * Post index
 
-- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-intro][wordpress verison]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
 - 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
+- 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
 
 # ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/08/hackers-guide-to-jiu-jitsu-2.png
 # ./titles-screens.png https://iocanel.com/wp-content/uploads/2021/08/titles-screens.png
