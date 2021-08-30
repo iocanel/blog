@@ -1,0 +1,253 @@
+#+BLOG: iocanel.com
+#+BLOG: iocanel.com
+#+ORG2BLOG:
+#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
+#+TITLE: Hackers guide to Jiu Jitsu: mplayer
+#+DESCRIPTION: Using mplayer hacks to capture notes from bjj instructionals
+#+CATEGORY: Jiu Jitsu
+#+TAGS: Jiu Jitsu
+
+[[./hackers-guide-to-jiu-jitsu.png]]
+* Intro
+
+I am a 40+ software engineer and recreational Jiu Jitsu practitioner, struggling with vast amount of information related to the sport.
+I decided to make use of my `computer` skills to aid me in the process of taming this new skill.
+
+This post is going to demonstrate how to use [[http://www.mplayerhq.hu/][mplayer]] for watching Jiu Jitsu instructionals, in order to:
+
+- Capture notes
+- Create bookmarks
+- Create animated gifs demonstrating techniques
+
+This post will cover the fundamentals and will be the base for future posts that will demonstrate integrations with ohter tools.  
+
+* What is mplayer ?
+
+[[http://www.mplayerhq.hu/][mplayer]] as the name implies is a video player. It's free & opensource and available for most operationg systems.
+It's pretty minimal but powerful and is often used by other players as a backend.
+
+There are two main features that make it stand out from the rest of the available players.
+
+** Slave mode
+   When [[http://www.mplayerhq.hu/][mplayer]] is run on slave mode, it allows other programs to communicate with it, through a file. Programs append commands to the file and mplayer can pick them up.
+   So, other programs can
+   - start / stop
+   - go to a specific timestamp
+   - extract player information
+     
+** Custom key bindngs and commands
+   With custom keybindings and commands users are able to easily invoke external scripts, which is very handy as we will see later on.
+
+* Why we need mplayer ?
+
+In previous parts in the series, we saw how we could do things like creating animated gifs.
+While technically it was pretty straight forward, it was not very user frindly as the user had to manually keep track of the file name and start/stop timestamps.
+
+[[http://www.mplayerhq.hu/][mplayer]] running on slave mode can easily helps us create a user friendly solution to this problem.
+
+Sometimes we just want to bookmark the video currently playing so that we can resume later on. 
+Other times we just want to have bookmarks as a reference in our notes.
+Again [[http://www.mplayerhq.hu/][mplayer]] can provide an elegant solution to these problems.
+
+* Installing mplayer
+
+This section describes how to install it based on your operating system.
+
+** Linux
+
+   If you are using linux chances are that you don't really need me to tell you how to install it.
+
+*** Fedora
+
+#+begin_src sh
+  sudo dnf -y install mplayer
+#+end_src
+
+*** Ubuntu
+   
+#+begin_src sh
+  sudo apt-get install mplayer
+#+end_src
+
+** OSX
+
+#+begin_src sh
+  brew install mplayer
+#+end_src
+
+** Windows
+
+Windows users will have to install and get familiar with [[https://docs.microsoft.com/en-us/windows/wsl/install-win10][wsl]], first.
+Then:
+
+#+begin_src sh
+  sudo apt-get install mplayer
+#+end_src
+
+From now on all command we provide will need to go via [[https://docs.microsoft.com/en-us/windows/wsl/install-win10][wsl]] unless explicitly specified.
+
+* Slave mode
+
+To start mplayer in slave mode:
+
+#+begin_src sh
+mplayer -slave -quiet <movie>
+#+end_src
+
+Now you can enter commands in the console and read the output from there.
+
+Or you can use a fifo file instead:
+
+#+begin_src sh
+  mkfifo </tmp/fifofile>
+  mplayer -slave -input file=</tmp/fifofile> <movie>
+#+end_src
+
+However, it's much simler if you just configure mplayer to always run in slave mode (by adding the config below to `.mplayer/config`):
+
+#+begin_src conf
+  slave=true
+  input:file=/path/to/home/.local/share/mplayer/fifo
+#+end_src
+
+This assumes that you've created up front a fifo file:
+
+#+begin_src sh
+  mkdir -p ~/.local/share/mplayer
+  mkfifo ~/.local/share/mplayer/fifo
+#+end_src
+
+*Note*: You can use whatever path for the fifo file.
+
+** Using the slave mode
+
+We will start [[http://www.mplayerhq.hu/][mplayer]] in slave mode and redirect it's output in a temporary file so that we can process the command output:
+
+#+begin_src sh
+  mplayer -slave -input file=</tmp/fifofile> <movie> > </tmp/output>
+#+end_src
+
+Now we can start executing commands:
+
+*** Getting the file name
+
+We are going to send `get_file_name` to player in order to get the file name:
+
+#+begin_src sh
+  echo get_file_name > /tmp/fifofile
+  sleep 1
+  cat /tmp/output | grep ANS_FILENAME | tail -n 1 | cut -d "=" -f2
+#+end_src
+
+*** Getting the timestamp
+
+We are going to send `get_time_pos` to player in order to get the time position:
+
+#+begin_src sh
+  echo get_time_pos > /tmp/fifofile
+  sleep 1
+  cat /tmp/output | grep ANS_TIME_POSITION | tail -n 1 | cut -d "=" -f2
+#+end_src
+
+** Full list of available commands
+
+  You can find a complete reference of commands at: http://www.mplayerhq.hu/DOCS/tech/slave.txt
+
+** Putting the commands together
+
+Let's combine the commands above in order to easily create an animated gif.
+The idea is to have a command to:
+
+- mark the beggining
+- mark the end
+- create the animated gif
+
+The following scripts will assume that the fifo file can be found at: `~/.local/share/mplayer/fifo` and the output is redirected to `~/.local/share/mplayer/output`.
+
+*** Mark the beggining of a subsection
+
+We can use the slave mode in order to ask the player which file is currently playing and which is the currrent position in the file.
+We will save those under `.local/share/mplayer/filename` and `.local/share/mplayer/beginning`.
+
+#+begin_src sh :tangle ~/bin/mplayer-mark-beginning :shebang #!/bin/bash
+  echo get_property path > ~/.local/share/mplayer/fifo
+  echo get_time_pos > ~/.local/share/mplayer/fifo
+  sleep 1
+  cat ~/.local/share/mplayer/output | grep ANS_path | tail -n 1 | cut -d "=" -f2 > ~/.local/share/mplayer/filename
+  cat ~/.local/share/mplayer/output | grep ANS_TIME_POSITION | tail -n 1 | cut -d "=" -f2 > ~/.local/share/mplayer/beginning
+#+end_src
+
+
+*** Mark the end of a subsection
+
+In the same spirit we can use `.local/share/mplayer/end` in order to mark the end of a subsection.
+
+#+begin_src sh :tangle ~/bin/mplayer-mark-end :shebang #!/bin/bash
+  echo get_property path > ~/.local/share/mplayer/fifo
+  echo get_time_pos > ~/.local/share/mplayer/fifo
+  sleep 1
+  cat ~/.local/share/mplayer/output | grep ANS_path | tail -n 1 | cut -d "=" -f2 > ~/.local/share/mplayer/filename
+  cat ~/.local/share/mplayer/output | grep ANS_TIME_POSITION | tail -n 1 | cut -d "=" -f2 > ~/.local/share/mplayer/end
+#+end_src
+
+*** Bookmarking
+
+    The scripts above pretty much create bookmarks to the beginning and the end of a section within the video.
+    So, we can use those bookmarks to resume playback to the desired bookmark. Let's see how we can create a small script that will read `.local/share/mplayer/beginning` and `.local/share/mplayer/end` to resume playback.
+
+    #+begin_src sh :tangle ~/bin/mplayer-resume :shebang #!/bin/bash
+      BEGINNING=`cat ~/.local/share/mplayer/beginning`
+      VIDEO=`cat ~/.local/share/mplayer/filename`
+      mplayer "$VIDEO" -ss $BEGINNING > ~/.local/share/mplayer/output
+    #+end_src
+
+*** Create an animated gif
+
+#+begin_src sh :tangle ~/bin/mplayer-create-animated-gif :shebang #!/bin/bash
+    FRAMERATE=${1:-5}    
+    SCALE=${2:-"512:-1"}    
+    
+    BEGINNING=`cat ~/.local/share/mplayer/beginning`
+    END=`cat ~/.local/share/mplayer/end`
+    VIDEO=`cat ~/.local/share/mplayer/filename`
+    
+    NAME="${VIDEO%.*}"
+    EXTENSION="${VIDEO##*.}"
+    
+    ffmpeg -y -i "$VIDEO" -r $FRAMERATE -vf scale=$SCALE -ss $BEGINNING -to $END "$NAME.gif" < /dev/null 
+#+end_src
+
+* Key bindings
+
+It's possible to define custom keybindings so that we assign bindings for the commands we created.
+[[http://www.mplayerhq.hu/][mplayer]] allows users to define bindings via the `.mplayer/input.conf`.
+
+For example:
+
+#+begin_example
+CTRL-f run "echo $path > /home/iocanel/.local/share/mplayer/filename"
+#+end_example
+
+This will save the path of the currently played file each time `CTRL-f` is pressed.
+
+** Using custom key bindings to create animated gifs
+
+Let's combine the commands created so far with keybindings so that we can invoke them directly from the player:
+
+#+begin_example
+CTRL-b run mplayer-mark-beggining
+CTRL-e run mplayer-mark-end
+CTRL-g run mplayer-create-animated-gif
+#+end_example
+
+* Thoughts
+
+So far we've seen how we can easily split really large instructionals in smaller chunks, how to use our player in order to bookmark/resume playback and how to easily create animated gifs.
+Most importantly we've seen how to interact with the player from external projects, which opens up the way for many different integrations.
+Future posts in the series will focus on the note taking part which in my opinion is really important in the process of studying Jiu Jitsu.
+
+* Post index
+
+- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-intro][wordpress verison]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
+- 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
