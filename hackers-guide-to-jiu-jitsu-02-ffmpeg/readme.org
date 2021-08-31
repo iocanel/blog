@@ -43,7 +43,7 @@ This section describes how to install it based on your operating system.
 
 ** Linux
 
-   If you are using linux chances are that you don't really need me to tell you how to install it.
+If you are using linux chances are that you don't really need me to tell you how to install it.
 
 *** Fedora
 
@@ -92,7 +92,7 @@ This makes it possible to use [[https://www.ffmpeg.org/][ffmpeg]] in order to de
 This can be done using a command like:
 
 #+begin_src sh
-ffprobe -show_frames -of compact=p=0 -f lavfi "movie=instructional.mkv,select=gt(scene\,0.8)" | awk -F "|" '{print $7}' | cut -f2 -d"="
+  ffprobe -show_frames -of compact=p=0 -f lavfi "movie=instructional.mkv,select=gt(scene\,0.8)" | awk -F "|" '{print $7}' | cut -f2 -d"="
 #+end_src
 
 The command above does the following:
@@ -109,7 +109,8 @@ There are many things you can do with this timestamp. Below are some examples:
 
 The script below will attempt to detect chapters and split the long video accordingly.
 
-#+begin_src sh :tangle ~/bin/split-video-by-chapter.sh  :shebang #!/bin/bash
+#+begin_src sh :tangle ~/bin/split-video-by-chapter.sh  :tangle-mode (identity #o755)
+  #!/bin/bash
   VIDEO=$1
   EXTENSION="${VIDEO##*.}"
   FRAMERATE=5
@@ -119,10 +120,10 @@ The script below will attempt to detect chapters and split the long video accord
   
   # For each timestamp:
   ffprobe -show_frames -of compact=p=0 -f lavfi "movie=$1,select=gt(scene\,0.8)" 2> /dev/null | awk -F "|" '{print $7}' | cut -f2 -d"=" | while read timestamp; do
-  
+      
       #Keep the integer part of the timestamp
       ts=`echo $timestamp | cut -d"." -f1`
-  
+      
       #Convert timestamp to time using the HH:mm:ss format
       hours=`expr $ts / 3600`
       if [ $hours -lt 10 ]; then
@@ -137,7 +138,7 @@ The script below will attempt to detect chapters and split the long video accord
           seconds="0$seconds"
       fi
       end="$hours:$minutes:$seconds"
-
+  
       # Perform the split
       ffmpeg -y -i $1 -ss $begin -to $end scene-$scene.$EXTENSION < /dev/null 2> /dev/null
       begin="$hours:$minutes:$seconds"
@@ -158,7 +159,8 @@ Here's an example an animated image that is demonstrating the `pumping method` f
 [[./The pumping method grip break.gif]]
   
 
-#+begin_src sh :tangle ~/bin/create-animated-gif.sh :shebang #!/bin/bash
+#+begin_src sh :tangle ~/bin/create-animated-gif.sh :tangle-mode (identity #o755)
+  #!/bin/bash
   VIDEO=$1
   BEGINNING=${2:-"00:00:00"}
   END=${3:-"00:01:00"}
@@ -185,7 +187,7 @@ The challenge here is to spot and keep track of the beginning and end times. In 
 Sometimes you just want to extract a single image instead of an animated gif. This can be especially useful if you intend to print your notes on paper.
 
 #+begin_src sh
-    ffmpeg -i <your video here> -ss <timestamp in HH:mm:ss> -vframes 1 screenshot.png < /dev/null 2> /dev/null
+  ffmpeg -i <your video here> -ss <timestamp in HH:mm:ss> -vframes 1 screenshot.png < /dev/null 2> /dev/null
 #+end_src
 
 * Post index

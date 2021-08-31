@@ -32,14 +32,14 @@ It's pretty minimal but powerful and is often used by other players as a backend
 There are two main features that make it stand out from the rest of the available players.
 
 ** Slave mode
-   When [[http://www.mplayerhq.hu/][mplayer]] is run on slave mode, it allows other programs to communicate with it, through a file. Programs append commands to the file and mplayer can pick them up.
-   So, other programs can
-   - start / stop
-   - go to a specific timestamp
-   - extract player information
-     
+When [[http://www.mplayerhq.hu/][mplayer]] is run on slave mode, it allows other programs to communicate with it, through a file. Programs append commands to the file and mplayer can pick them up.
+So, other programs can
+- start / stop
+- go to a specific timestamp
+- extract player information
+
 ** Custom key bindngs and commands
-   With custom keybindings and commands users are able to easily invoke external scripts, which is very handy as we will see later on.
+With custom keybindings and commands users are able to easily invoke external scripts, which is very handy as we will see later on.
 
 * Why we need mplayer ?
 
@@ -58,7 +58,7 @@ This section describes how to install it based on your operating system.
 
 ** Linux
 
-   If you are using linux chances are that you don't really need me to tell you how to install it.
+If you are using linux chances are that you don't really need me to tell you how to install it.
 
 *** Fedora
 
@@ -94,7 +94,7 @@ From now on all command we provide will need to go via [[https://docs.microsoft.
 To start mplayer in slave mode:
 
 #+begin_src sh
-mplayer -slave -quiet <movie>
+  mplayer -slave -quiet <movie>
 #+end_src
 
 Now you can enter commands in the console and read the output from there.
@@ -154,7 +154,7 @@ We are going to send `get_time_pos` to player in order to get the time position:
 
 ** Full list of available commands
 
-  You can find a complete reference of commands at: http://www.mplayerhq.hu/DOCS/tech/slave.txt
+You can find a complete reference of commands at: http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
 ** Putting the commands together
 
@@ -172,7 +172,8 @@ The following scripts will assume that the fifo file can be found at: `~/.local/
 We can use the slave mode in order to ask the player which file is currently playing and which is the currrent position in the file.
 We will save those under `.local/share/mplayer/filename` and `.local/share/mplayer/beginning`.
 
-#+begin_src sh :tangle ~/bin/mplayer-mark-beginning :shebang #!/bin/bash
+#+begin_src sh :tangle ~/bin/mplayer-mark-beginning :tangle-mode (identity #o755)
+  #!/bin/bash
   echo get_property path > ~/.local/share/mplayer/fifo
   echo get_time_pos > ~/.local/share/mplayer/fifo
   sleep 1
@@ -185,7 +186,8 @@ We will save those under `.local/share/mplayer/filename` and `.local/share/mplay
 
 In the same spirit we can use `.local/share/mplayer/end` in order to mark the end of a subsection.
 
-#+begin_src sh :tangle ~/bin/mplayer-mark-end :shebang #!/bin/bash
+#+begin_src sh :tangle ~/bin/mplayer-mark-end :tangle-mode (identity #o755)
+  #!/bin/bash
   echo get_property path > ~/.local/share/mplayer/fifo
   echo get_time_pos > ~/.local/share/mplayer/fifo
   sleep 1
@@ -195,29 +197,31 @@ In the same spirit we can use `.local/share/mplayer/end` in order to mark the en
 
 *** Bookmarking
 
-    The scripts above pretty much create bookmarks to the beginning and the end of a section within the video.
-    So, we can use those bookmarks to resume playback to the desired bookmark. Let's see how we can create a small script that will read `.local/share/mplayer/beginning` and `.local/share/mplayer/end` to resume playback.
+The scripts above pretty much create bookmarks to the beginning and the end of a section within the video.
+So, we can use those bookmarks to resume playback to the desired bookmark. Let's see how we can create a small script that will read `.local/share/mplayer/beginning` and `.local/share/mplayer/end` to resume playback.
 
-    #+begin_src sh :tangle ~/bin/mplayer-resume :shebang #!/bin/bash
-      BEGINNING=`cat ~/.local/share/mplayer/beginning`
-      VIDEO=`cat ~/.local/share/mplayer/filename`
-      mplayer "$VIDEO" -ss $BEGINNING > ~/.local/share/mplayer/output
-    #+end_src
+#+begin_src sh :tangle ~/bin/mplayer-resume :tangle-mode (identity #o755)
+  #!/bin/bash
+  BEGINNING=`cat ~/.local/share/mplayer/beginning`
+  VIDEO=`cat ~/.local/share/mplayer/filename`
+  mplayer "$VIDEO" -ss $BEGINNING > ~/.local/share/mplayer/output
+#+end_src
 
 *** Create an animated gif
 
-#+begin_src sh :tangle ~/bin/mplayer-create-animated-gif :shebang #!/bin/bash
-    FRAMERATE=${1:-5}    
-    SCALE=${2:-"512:-1"}    
-    
-    BEGINNING=`cat ~/.local/share/mplayer/beginning`
-    END=`cat ~/.local/share/mplayer/end`
-    VIDEO=`cat ~/.local/share/mplayer/filename`
-    
-    NAME="${VIDEO%.*}"
-    EXTENSION="${VIDEO##*.}"
-    
-    ffmpeg -y -i "$VIDEO" -r $FRAMERATE -vf scale=$SCALE -ss $BEGINNING -to $END "$NAME.gif" < /dev/null 
+#+begin_src sh :tangle ~/bin/mplayer-create-animated-gif :tangle-mode (identity #o755)
+  #!/bin/bash
+  FRAMERATE=${1:-5}    
+  SCALE=${2:-"512:-1"}    
+  
+  BEGINNING=`cat ~/.local/share/mplayer/beginning`
+  END=`cat ~/.local/share/mplayer/end`
+  VIDEO=`cat ~/.local/share/mplayer/filename`
+  
+  NAME="${VIDEO%.*}"
+  EXTENSION="${VIDEO##*.}"
+  
+  ffmpeg -y -i "$VIDEO" -r $FRAMERATE -vf scale=$SCALE -ss $BEGINNING -to $END "$NAME.gif" < /dev/null 
 #+end_src
 
 * Key bindings
