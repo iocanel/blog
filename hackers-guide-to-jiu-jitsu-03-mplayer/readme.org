@@ -172,6 +172,7 @@ The following scripts will assume that the fifo file can be found at: `~/.local/
 We can use the slave mode in order to ask the player which file is currently playing and which is the currrent position in the file.
 We will save those under `.local/share/mplayer/filename` and `.local/share/mplayer/beginning`.
 
+#+NAME: mplayer-mark-beginning
 #+begin_src sh :tangle ~/bin/mplayer-mark-beginning :tangle-mode (identity #o755)
   #!/bin/bash
   echo get_property path > ~/.local/share/mplayer/fifo
@@ -186,6 +187,7 @@ We will save those under `.local/share/mplayer/filename` and `.local/share/mplay
 
 In the same spirit we can use `.local/share/mplayer/end` in order to mark the end of a subsection.
 
+#+NAME: mplayer-mark-end
 #+begin_src sh :tangle ~/bin/mplayer-mark-end :tangle-mode (identity #o755)
   #!/bin/bash
   echo get_property path > ~/.local/share/mplayer/fifo
@@ -200,6 +202,7 @@ In the same spirit we can use `.local/share/mplayer/end` in order to mark the en
 The scripts above pretty much create bookmarks to the beginning and the end of a section within the video.
 So, we can use those bookmarks to resume playback to the desired bookmark. Let's see how we can create a small script that will read `.local/share/mplayer/beginning` and `.local/share/mplayer/end` to resume playback.
 
+#+NAME: mplayer-mark-resume
 #+begin_src sh :tangle ~/bin/mplayer-resume :tangle-mode (identity #o755)
   #!/bin/bash
   BEGINNING=`cat ~/.local/share/mplayer/beginning`
@@ -209,6 +212,7 @@ So, we can use those bookmarks to resume playback to the desired bookmark. Let's
 
 *** Create an animated gif
 
+#+NAME: mplayer-creaate-animated-gif
 #+begin_src sh :tangle ~/bin/mplayer-create-animated-gif :tangle-mode (identity #o755)
   #!/bin/bash
   FRAMERATE=${1:-5}    
@@ -240,7 +244,7 @@ This will save the path of the currently played file each time `CTRL-f` is press
 ** Using custom key bindings to create animated gifs
 
 Let's combine the commands created so far with keybindings so that we can invoke them directly from the player:
-
+#+NAME: ~/.mplayer/input.conf`
 #+begin_example
 CTRL-b run mplayer-mark-beggining
 CTRL-e run mplayer-mark-end

@@ -109,6 +109,7 @@ There are many things you can do with this timestamp. Below are some examples:
 
 The script below will attempt to detect chapters and split the long video accordingly.
 
+#+NAME: split-video-by-chapter.sh
 #+begin_src sh :tangle ~/bin/split-video-by-chapter.sh  :tangle-mode (identity #o755)
   #!/bin/bash
   VIDEO=$1
@@ -159,6 +160,7 @@ Here's an example an animated image that is demonstrating the `pumping method` f
 [[./The pumping method grip break.gif]]
   
 
+#+NAME: creaate-animated.gif.sh
 #+begin_src sh :tangle ~/bin/create-animated-gif.sh :tangle-mode (identity #o755)
   #!/bin/bash
   VIDEO=$1
