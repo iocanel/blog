@@ -1,4 +1,7 @@
 #+BLOG: iocanel.com
+#+POSTID: 733
+#+DATE: [2021-09-01 Wed 12:38]
+#+BLOG: iocanel.com
 #+ORG2BLOG:
 #+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
 #+TITLE: Wordpress: Notes on syntax highlighting
@@ -62,3 +65,5 @@ If you are using an external post editor, just publish the post again and you're
 Now, the code blocks seem really nice and ready for use.
 I hope you found it useful. My future self most cerntaintly will!
 
+
+# ./enabling-classic-editor.png https://iocanel.com/wp-content/uploads/2021/09/enabling-classic-editor.png
