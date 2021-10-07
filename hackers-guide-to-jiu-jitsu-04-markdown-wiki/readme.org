@@ -242,5 +242,12 @@ Have a look at my demo [[https://github.com/iocanel/blog/tree/master/hackers-gui
 
 Also, I am really interested in knowing if how you organize your notes, so feel free to reach out to me and share your experiences, either by commenting, email etc.
 
+* Post index
+
+- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
+- 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
+- 04. Hackers guide to Jiu Jitsu: markdown wiki [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-markdown-wiki][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki][github version]]
+
 # ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/10/hackers-guide-to-jiu-jitsu.png
 # ./Boromir-Juji-Gatame.jpg https://iocanel.com/wp-content/uploads/2021/10/Boromir-Juji-Gatame.jpg
