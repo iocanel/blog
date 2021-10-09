@@ -10,9 +10,16 @@ No, I mean it!
 It's the one file that contains all the code, templates and data of my tracker,
 exported in html. 
 
+Keep reading, to see how you can harness the power of emacs and org mode to track your nutrition
+and even generate cool graphs like:
+
+[[./nutrition-table.png]]
+
+For quick demo you can check this short [[https://www.youtube.com/watch?v=GAhBFFLBJww][Youtube demo: Nutrition tracking using Emacs]].
+
 The post is available in 3 formats.
 - [[https://iocanel.com/2020/04/nutrition-tracking-using-emacs-and-org/][My Wordpress Blog]] (wordress sucks at rendering lisp, so the other formats are preferred)
-- [[https://github.com/iocanel/tree/master/nutrition-tracker-using-emacs][My Github Blog]]
+- [[https://github.com/iocanel/blog/tree/master/nutrition-tracking-using-emacs][My Github Blog]]
 - [[https://gist.github.com/iocanel/0b8bcdb3d69fb7731069cb872f836507][Gist]]
 
 All 3 formats are powered by a single org file called `nutrition.org`.
@@ -2850,13 +2857,6 @@ configuration:
   | # | <2021-04-17 Sat> | Oat burgers                                           |       2 |      240 |      452 |      34 |    34 |   8 |
   | # | <2021-04-17 Sat> | Lettuce salad                                         |       2 |      380 |      214 |       8 |    12 |  18 |
   | # | <2021-04-17 Sat> | Apple                                                 |       1 |      200 |      104 |       1 |    28 |   0 |
-  | # | <2021-11-11 Sun> | Bread with honey and sesame paste                     |       1 |       50 |      162 |       6 |    22 |   7 |
-  | # | <2021-11-11 Sun> | Banana / Medium                                       |       1 |       63 |       98 |       8 |     1 |   7 |
-  | # | <2021-11-11 Sun> | Pita with chicken suvlaki                             |       1 |      250 |      412 |      37 |    41 |  10 |
-  | # | <2021-11-11 Sun> | Spinach and rucola salad                              |       1 |      210 |      141 |       7 |     8 |  10 |
-  | # | <2021-11-11 Sun> | Chicken suvlaki                                       |       1 |      120 |      130 |      34 |     0 |   4 |
-  | # | <2021-11-11 Sun> | Spinach and rucola salad                              |       1 |      210 |      141 |       7 |     8 |  10 |
-  | # | <2021-11-11 Sun> | Whey protein / Biotech                                |       1 |       30 |      109 |      26 |     1 |   0 |
   | # | <2021-04-19 Mon> | Omelette / Double egg                                 |       1 |      126 |      196 |      16 |     2 |  14 |
   | # | <2021-04-19 Mon> | Apple                                                 |       1 |      200 |      104 |       1 |    28 |   0 |
   | # | <2021-04-19 Mon> | Lentil soup                                           |       1 |      300 |      250 |      15 |    36 |   5 |
@@ -2980,7 +2980,6 @@ configuration:
    | <2021-04-15 Thu> |           1486 |           134 |         129 |        25 |
    | <2021-04-16 Fri> |           1325 |           105 |         108 |        54 |
    | <2021-04-17 Sat> |           1136 |            82 |          88 |        44 |
-   | <2021-11-11 Sun> |           1193 |           125 |          81 |        48 |
    | <2021-04-19 Mon> |           1375 |           134 |          83 |        59 |
    | <2021-04-20 Tue> |           1714 |           114 |          98 |        97 |
    | <2021-04-21 Wed> |           1224 |            94 |         129 |        39 |
@@ -2996,6 +2995,8 @@ configuration:
    | <2021-06-10 Thu> |            311 |             9 |          44 |        13 |
    | <2021-06-24 Thu> |           1246 |           130 |         111 |        42 |
    | <2021-06-25 Fri> |             78 |            12 |           8 |         3 |
+   | <2021-06-29 Tue> |            129 |            24 |           8 |         3 |
    #+END
 
-   [[file:nutrition-table.png][Nutrition Table]]
+
+# ./nutrition-table.png https://iocanel.com/wp-content/uploads/2021/10/nutrition-table.png
