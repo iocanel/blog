@@ -7,7 +7,7 @@
 #+ORG2BLOG:
 #+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
 #+TITLE: Hackers guide to Jiu Jitsu: Markdown Wiki
-#+DESCRIPTION: Using mplayer hacks to capture notes from bjj instructionals
+#+DESCRIPTION: How to create a wiki to host your BJJ notes and media
 #+CATEGORY: Jiu Jitsu
 #+TAGS: Jiu Jitsu
 
@@ -248,6 +248,8 @@ Also, I am really interested in knowing if how you organize your notes, so feel 
 - 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
 - 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
 - 04. Hackers guide to Jiu Jitsu: markdown wiki [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-markdown-wiki][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki][github version]]
+- 05. Hackers guide to Jiu Jitsu: flowcharts [[https://iocanel.com/2022/01/hackers-guide-to-jiu-jitsu-flowcharts][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-05-flowcharts][github version]]
+
 
 # ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/10/hackers-guide-to-jiu-jitsu.png
 # ./Boromir-Juji-Gatame.jpg https://iocanel.com/wp-content/uploads/2021/10/Boromir-Juji-Gatame.jpg
