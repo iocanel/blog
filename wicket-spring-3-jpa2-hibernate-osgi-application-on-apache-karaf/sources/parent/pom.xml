@@ -21,7 +21,7 @@
 		<spring-osgi-version>1.2.1</spring-osgi-version>
 		<wicket-version>1.4.9</wicket-version>
 		<!-- Persinstence Properties -->
-		<hibernate-version>3.5.2-Final</hibernate-version>
+		<hibernate-version>5.4.24.Final</hibernate-version>
 		<hibernate-validator-version>4.0.2.GA</hibernate-validator-version>
 		<hibernate-common-annotations-version>3.2.0.Final</hibernate-common-annotations-version>
 		<ehcache-version>2.1.0</ehcache-version>
