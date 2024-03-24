@@ -75,6 +75,7 @@ cat toc.md | sort | uniq | while read file; do
     if [ "$dry_run" = true ]; then
       echo "- [$title]($file)"
     else
+      file=$(echo "$file" | sed 's/ /%20/g')
       echo "- [$title]($file)" >> README.md
     fi
 done
