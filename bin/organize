@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# A script that organizes org files for ox-hugo export based on their date and title
+# Each blog post is a readme.org file. The date and title should be extracted from the org metadata
+# The resulting format shoud be YYYY/MM/DD/title/ and it should contain the readme.org and all files found in the original folder
+
+
+# Get the list of org files
+files=$(find . -name "readme.org")
+
+# For each file
+for file in $files; do
+    # Get the date and title
+    date=$(grep -i "#+date" $file | awk '{print $2}' | tr -d '[]' | sed 's/-/\//g')
+    title=$(grep -i "#+title" $file | sed 's/#+title: //i')
+    target=$(echo $date/$title | sed 's/ /\\ /g')
+    mkdir -p $target
+    cp -r $(dirname $file)/* $target
+done
