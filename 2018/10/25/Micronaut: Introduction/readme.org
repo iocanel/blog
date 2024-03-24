@@ -1,0 +1,229 @@
+#+BLOG: iocanel.com
+#+POSTID: 504
+#+DATE: [2018-10-25 Thu 14:39]
+#+BLOG: iocanel.com
+#+ORG2BLOG:
+#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
+#+TITLE: Micronaut: Introduction
+#+DESCRIPTION: Introduction to micronaut
+#+CATEGORY: Development
+#+TAGS: Java
+
+* Prologue
+
+As I am approaching my 40s its becoming harder and harder to get really excited with a new framework. There are of course some exception to this rule and [[http://micronaut.io][micronaut]] is such an exception.
+I won't get into details here, but in many ways I feel that [[http://micronaut.io][micronaut]] is a framework I would like to have written myself...
+
+So, this post is going to be a first look at [[http://micronaut.io][micronaut]]. It will include:
+
+- an introduction
+- my first application
+- packaging the application as a [[https://docker.io][docker]] image
+- packaging and running inside [[https://openshift.com][openshift]].
+
+* What is micronaut?
+
+According to the official documentation [[http://micronaut.io][micronaut]] is a micro services framework, for building modular and testable microservice applications.
+Some highlights:
+
+- Own DI
+- Autoconfiguration
+- Service Discovery 
+- Http Routing
+
+and more...
+
+The framework has been created from the same team that brought us [[https://grails.org][grails]] and it does look like it in many ways.
+When it comes to features however, it feels like a combination of [[https://spring.io/projects/spring-boot][spring boot]] and [[https://cloud.spring.io][spring cloud]] that promises to be more lightweight.
+
+** More lightweight?
+
+Traditional DI approaches in Java be it [[https://spring.io][spring]], CDI etc, is built around reflection, proxies etc. Not so long ago there was an effort aiming mostly mobile devices that was built around the idea of handling most of the problem at compile time instead of runtime.
+The project was called [[https://github.com/square/dagger][dagger]]. I am not sure how it went in terms of adoption, but I didn't feel it ever had a strong presence in the enterprise world.
+
+What does these have to do with micronaut?
+
+[[http://micronaut.io][micronaut]] is using a similar approach with [[https://github.com/square/dagger][dagger]], relying more on annotation processors instead of using reflection, proxies etc.
+
+
+* Getting started
+
+The first thing one needs to get started with [[http://micronaut.io][micronaut]] is the `mn` binary, which gives you access to a [[https://grails.org][grails]]-like cli:
+
+** Installation
+
+To install the `mn` the documentation suggests the use of [[https://sdkman.io][sdkman]] (I've also blogged on [[https://sdkman.io][sdkman]] [[http://iocanel.com/2018/10/a-quick-look-at-sdkman][here]]).
+
+#+BEGIN_SRC shel
+sdk install micronaut
+#+END_SRC
+
+** Creating a hello world example
+
+Once the installation is complete you can create a new [[http://micronaut.io][micronaut]] application using the cli:
+
+#+BEGIN_SRC shell
+mn create-app helloworld 
+#+END_SRC
+
+#+RESULTS:
+|                                     | Generating  | Java    | project... |                                                                              |
+| ................................... |             |         |            |                                                                              |
+|                                     | Application | created | at         | /home/iocanel/workspace/src/github.com/iocanel/blog/micronaut-pt1/helloworld |
+
+The generated project is a [[https://docker.io][docker]]-ready [[https://gradle.org][gradle]] project that contains just a single class:
+
+#+BEGIN_SRC java
+package helloworld;
+
+import io.micronaut.runtime.Micronaut;
+
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+#+END_SRC
+
+Note, that options are provided to select language, build tool and testing framework.
+
+This will be very familiar to [[https://spring.io/projects/spring-boot][spring boot]] users.
+
+Now, let's see how we can create a rest controller. From within the helloworld directory:
+
+#+BEGIN_SRC shell :dir helloworld
+mn create-controller HelloController
+#+END_SRC
+
+#+RESULTS:
+|   | Rendered | template | Controller.java     | to | destination | src/main/java/helloworld/HelloController.java     |
+|   | Rendered | template | ControllerTest.java | to | destination | src/test/java/helloworld/HelloControllerTest.java |
+
+The command will generate the controller class and also a test for the controller.
+
+The controller out of the box will just provide a single method that returns http status `OK`.
+That can be easily modified, to:
+
+#+BEGIN_SRC java
+package helloworld;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller("/hello")
+public class HelloController {
+
+    @Get("/")
+    public String index() {
+        return "Hello World!";
+    }
+}
+#+END_SRC
+
+To run the application you can just use:
+
+#+BEGIN_SRC shell :dir helloworld
+./gradlew run
+#+END_SRC
+
+*** Noteworthy
+
+It seems that its possible to specify things like language and testing framework not only on application level but also on controller level too.
+So for instance we can add a second controller in kotlin:
+
+#+BEGIN_SRC shell :dir helloworld
+mn create-controller KotlinController --lang kotlin
+#+END_SRC
+
+#+RESULTS:
+|   | Rendered | template | Controller.kt       | to | destination | src/main/kotlin/helloworld/KotlinController.kt     |
+|   | Rendered | template | ControllerTest.java | to | destination | src/test/java/helloworld/KotlinControllerTest.java |
+
+The code generation part worked a treat, however I wasn't able to get the kotlin controller (inside a java project) running even when I manually added the kotlin plugin inside the `build.gradle` file.
+
+** Packaging the application 
+
+As mentioned above the generated app is [[https://docker.io][docker]]-ready. 
+Meaning that it comes with a docker file.
+#+BEGIN_SRC shell :dir helloworld
+docker build -t iocanel/mn-helloworld:latest .
+#+END_SRC
+
+#+RESULTS:
+
+The first time I tried to build the image, it failed and that was due to the fact that the docker build relies on copying the jar that's expected to be build locally.
+While, I am not against this approach, when its not coordinated by an external tool (e.g. [[https://maven.fabric8.io][fabric8 maven plugin]]) it does feel a bit weird.
+
+Second attempt:
+
+#+BEGIN_SRC shell :dir helloworld
+./gradlew build
+docker build -t iocanel/mn-helloworld:latest .
+#+END_SRC
+
+This time everything worked smoothly! Let's see what we got in terms of size and startup times compared to [[https://spring.io/projects/spring-boot][spring boot]].
+
+|             | jar  | uberjar | docker | startup time |
+| micronaut   | 1.4K | 12M     | 114M   | 0.892 sec    |
+| spring boot | 3.4  | 16M     | 119M   | 2.232 sec    |
+
+Please note that these measurements are simplistic, they are not meant to prove anything and are there just give a very rough idea of the overall behavior of [[http://micronaut.io][micronaut]].
+
+** Packaging and running inside Openshift
+
+For vanilla [[https://kubernetes.io][kubernetes]]  the packaging process doesn't differ much. In this section I'll describe how you can package and run the application in [[https://openshift.com][openshift]].
+
+The first step is to define a binary build. The binary build will use the `source to image` for java.
+Once the build is defined, we can start it and pass the folder that contains the [[http://micronaut.io][micronaut]] uberjar as a parameter.
+
+#+BEGIN_SRC shell :dir helloworld
+  oc new-build --binary --strategy=source --name=helloworld fabric8/s2i-java:2.3
+  oc start-build helloworld --from-dir=./build/libs --follow
+#+END_SRC
+
+#+RESULTS:
+
+The resulting image will include the uberjar under /deployments (this is how the fabric8 s2i image works).
+So all we need, is to start a new app and just tell the container which jar to use.
+
+#+BEGIN_SRC shell :dir helloworld
+  oc new-app helloworld:latest -e JAVA_APP_JAR=/deployments/helloworld-0.1-all.jar
+#+END_SRC
+
+This will create a new [[https://docs.openshift.com/enterprise/3.0/dev_guide/deployments.html][DeploymentConfig]] and a service for our application. In a few seconds the application will be up and running. Let's try it out.
+
+*** Exposing our application 
+The service that was created by the `oc new-app` command will NOT expose port 8080 which is what we need. That's because the `fabric8/s2i-java` image doesn't expose it (feel free to correct me here if I missed something).
+So, we will delete the generated service and create and expose one that matches our needs.
+
+#+BEGIN_SRC shell
+  oc delete svc helloworld
+  oc expose dc helloworld --port 8080,8787,9779
+  oc expose svc helloworld
+#+END_SRC
+
+This will create the service exposing port 8080 and also expose the service to `http://helloworld-micronaut.127.0.0.1.nip.io`.
+
+Now, its just a matter of using curl:
+
+#+BEGIN_SRC shell
+curl helloworld-micronaut.127.0.0.1.nip.io/hello
+#+END_SRC
+
+* Epilogue
+
+I think that this is enough for a first look.
+
+I intend to write additional posts in order to try out things like:
+- hooking a database
+- using circuit breakers
+- tracing 
+- more ...
+
+
+
+
+
+
+

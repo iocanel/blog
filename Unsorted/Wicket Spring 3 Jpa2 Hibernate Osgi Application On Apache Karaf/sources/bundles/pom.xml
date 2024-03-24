@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>net.iocanel</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../parent/</relativePath>
+	</parent>
+	<groupId>net.iocanel</groupId>
+	<artifactId>bundles</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Prototype :: Bundles</name>
+
+	<modules>
+		<module>jacc</module>
+		<module>hibernate-core</module>
+		<module>hibernate-ehcache-integration</module>
+		<module>hibernate-validator</module>
+	</modules>
+
+	<dependencies>
+		<!-- Spring Dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.transaction</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.web</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context.support</artifactId>
+		</dependency>
+
+		<!-- Spring Dynamic Module Dependencies -->
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.extender</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.web</artifactId>
+		</dependency>
+
+		<!-- Wicket Dependencies -->
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket-extensions</artifactId>
+		</dependency>
+
+		<!-- AOP Related Dependencies -->
+		<dependency>
+			<groupId>org.aopalliance</groupId>
+			<artifactId>com.springsource.org.aopalliance</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.runtime</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.cglib</groupId>
+			<artifactId>com.springsource.net.sf.cglib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.objectweb.asm</groupId>
+			<artifactId>com.springsource.org.objectweb.asm</artifactId>
+		</dependency>
+
+		<!-- Misc Dependencies -->
+		<dependency>
+			<groupId>org.jboss.javassist</groupId>
+			<artifactId>com.springsource.javassist</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.googlecode.jtype</groupId>
+			<artifactId>com.springsource.com.googlecode.jtype</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>com.springsource.org.dom4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.stream</groupId>
+			<artifactId>com.springsource.javax.xml.stream</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>com.springsource.javax.xml.bind</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>com.springsource.javax.activation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>com.springsource.javax.persistence</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>com.springsource.javax.validation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>com.springsource.org.apache.tools.ant</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>com.springsource.antlr</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.log4j</groupId>
+			<artifactId>com.springsource.org.apache.log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mysql.jdbc</groupId>
+			<artifactId>com.springsource.com.mysql.jdbc</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>wicket-osgi</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<inherited>true</inherited>
+				<configuration>
+					<includeDependencies>false</includeDependencies>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>directory-inline</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+

@@ -1,0 +1,255 @@
+#+BLOG: iocanel.com
+#+POSTID: 757
+#+BLOG: iocanel.com
+#+DATE: [2021-08-30 Mon 21:48]
+#+BLOG: iocanel.com
+#+BLOG: iocanel.com
+#+ORG2BLOG:
+#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
+#+TITLE: Hackers guide to Jiu Jitsu: Markdown Wiki
+#+DESCRIPTION: How to create a wiki to host your BJJ notes and media
+#+CATEGORY: Jiu Jitsu
+#+TAGS: Jiu Jitsu
+
+[[./hackers-guide-to-jiu-jitsu.png]]
+* Intro
+
+I am a 40+ software engineer and recreational Jiu Jitsu practitioner, struggling with vast amount of information related to the sport.
+I decided to make use of my `computer` skills to aid me in the process of taming this new skill.
+
+In this section I am going to discuss why and how [[https://en.wikipedia.org/wiki/Markdown][markdown]] is the ideal format for using for your notes. I am also going to conver how
+to use [[https://en.wikipedia.org/wiki/Markdown][markdown]] in order to maintain wiki/second brain for your Jiu Jitsu notes.
+
+* What is markdown ?
+
+  Markdown is a lightweight markup language for creating formatted text using a plain-text editor.
+  Formatting includes things like:
+
+  - Headers
+  - Bold, italic, underlined text
+  - Images
+  - Hyperlinks
+  - Tables
+
+  If you know what html is, you can think of [[https://en.wikipedia.org/wiki/Markdown][markdown]] as an alternative to html that instead of weird tags, just makes clever use of symbols.
+
+  Here is an example:
+
+  #+begin_src markdown
+
+    # Heading
+    ## Sub-heading
+
+       Unordered list:
+
+      - item 1
+      - item 2
+      - item 3
+
+    | Syntax      | Description |
+    | ----------- | ----------- |
+    | Header      | Title       |
+    | Paragraph   | Text        |
+
+  #+end_src
+
+  
+* Why markdown ?
+
+  It is 100% pure text. No propriatory file formats, no coupling to a particular editor or tool.
+  You can easily edit it from all your devices without the need of any specialized software.
+
+  This also means that you can easily generate or manipulate it using scripts (cough cough).
+  This is really important because we can easily export information from instructionals directly into [[https://en.wikipedia.org/wiki/Markdown][markdown]].
+
+  For example, we can generate an animated gif, as demonstrated in previous posts and embed the image into markdown (e.g. see my [[https://github.com/iocanel/blog/blob/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki/wiki/double-under.md][notes on 'Double Under']]).
+
+  Most importantly, [[https://en.wikipedia.org/wiki/Markdown][markdown]] supports links, which is what makes using [[https://en.wikipedia.org/wiki/Markdown][markdown]] for building ourselves a second brain (interconnected notes).
+
+
+* What is a wiki ?
+
+  After searched for a proper definition in multiple wiki pages, I came up with:
+  
+  `Wiki is a knowledge base presented as collection of well connected web pages and colaboratively edited.`
+
+  A richer definition can be found in [[https://en.wikipedia.org/wiki/Wiki][wikipedia: wiki]].
+
+  In this serires of posts we don't really care about the collaborative part, but more about the edited that implies that a wiki is something living/evolving, that is expected to be edited / updated.
+  
+* Why wiki ?
+
+  When I first started taking notes on Jiu Jitsu, I used a single text file, were I kept things. As the file grew larger, it was becoming harder and harder to easily jump to a particular note in the file.
+  Also, there were cases were I needed to link notes together ...
+
+  Think for a moment Juji gatame (armbar). How does one organize notes on juji gatame? 
+
+  [[./Boromir-Juji-Gatame.jpg]]
+
+   - Do they go in the attacks from mount section?
+   - Do they go in the attacks from closed guard section?
+   - Do they go in the flying attacks? 
+   - Do they go in the escapes from popular attacks?
+
+   I think that it should go everywhere. And the only pragmatic way for this to happen is by linking `juji gatame` to all of the sections listed above.
+
+   When it comes to note taking, anything that can't be represented by a single tree-like structure and contains links for one topic to another is better split per topic and use linking to bring pieces together.
+
+   This alone is enough for one to pickup wiki.
+   Additional points for familiarity.
+   And most importantly it is something that can be easily combined with [[https://en.wikipedia.org/wiki/Markdown][markdown]] that is already mentioned above.
+
+   Have a look at my demo [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki/wiki/index.md][wiki]], to get some idea:
+
+   This is not my complete wiki but something that I put together for the shake of this post (with hopefully enough teasers inside). It includes:
+
+   - Chunks of my personal notes
+   - Flow chart diagrams (for techniques) that I created myself (and yes, I will blog about how you can create them too).
+   - An animated gif or two that summarize techniques
+
+   This might also be a nice starting point for your own wiki, if you are sold on the idea.
+   
+* Creating a markdwon based wiki for Jiu jitsu
+
+  Next step is to pick ourselves up the right tool for the job. Below there are the top three candidates:
+
+  - [[https://github.com/][Github]]
+  - [[http://dynalon.github.io/mdwiki/#!index.md][mdwiki]]
+  - [[https://tiddlywiki.com/][tiddlywiki]]
+
+**  Github
+
+   Github is a [[https://git-scm.com/][git]] hosting service.
+   
+   _*Oversimplification alert*_
+
+   Think of it as service that allows you to create public or private shared folders, that contain textual (mostly) and binary files. The service also keeps history of changes and provides a platform for collaboration with others.
+   I wouldn't suggest it to people not already familiar with git.
+
+   My demo [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki/wiki/index.md][wiki]] is hosted on [[https://github.com/][Github]], so you get the idea.
+   
+** Tiddlywiki
+
+   A wiki solution, that allows users to host their wiki either locally or publicly. It's pretty extensible and one of the extensions provides [[https://en.wikipedia.org/wiki/Markdown][markdown]] support. 
+   Even thought it seems pretty powerful, the installation of extensions proved to be a little bit tricky for me, so I wouldn't recommend it either.
+
+   
+** mdwiki.
+   
+   [[http://dynalon.github.io/mdwiki/#!index.md][mdwiki]] (as the namely implies) is a [[https://www.markdownguide.org/][markdown]] based wiki. I found it pretty simple to install and use and it's what I recommend to use in this post.
+   *Note*: This solution is not standalone and does require the use of an http server (see below).
+
+* Installing mdwiki
+
+  Go to [[https://github.com/Dynalon/mdwiki/releases][mdwiki releases page]] and grab the latest release zip file. At the time of writing this was [[https://github.com/Dynalon/mdwiki/releases/download/0.6.2/mdwiki-0.6.2.zip][mdwiki-0.6.2.zip]]
+  Extract the contents of the zip in the folder you wish to save your notes.
+
+  
+  On most systems, something like this would work. 
+
+   #+begin_src sh
+   unzip mdwiki-0.6.2.zip
+   #+end_src
+
+  Or use whatever you already use for extracting zip archives.
+  
+  
+* Installing an http server
+
+  We will need an http server to serve our wiki.
+ 
+** Machines with nodejs installed (Windows, OSX & Linux)
+
+   On machines with [[https://nodejs.org/en/][nodejs]] already installed the easiest solution is to install [[https://www.npmjs.com/package/http-server][http-sever]] via npm.
+
+   #+begin_src sh
+   npm install -g http-server
+   #+end_src
+
+   If you don't have [[https://nodejs.org/en/][nodejs]] installed, then follow the operating system specific options.
+
+** Windows
+
+   On windows you can just use the [[https://www.microsoft.com/en-us/p/simple-http-server/9nt5t97khpqg?activetab=pivot:overviewtab][simple http server]] or any other server of your choice.
+   Just install the application and select the [[http://dynalon.github.io/mdwiki/#!index.md][mdwiki]] folder as the server root.
+
+
+* Using the http server with your wiki
+
+  Assuming that you have your wiki files under `wiki` in your home directory, you could try:
+
+  #+begin_src sh
+  http-server wiki
+  #+end_src
+
+  or in general
+
+  #+begin_src sh
+  http-sevrver /path/to/wiki
+  #+end_src
+
+  
+* Using mdwiki via docker
+
+  Maybe this whole series should have started with post on [[https://www.docker.com/][docker]] but it didn't. So, I'll just through here a few words on [[https://www.docker.com/][docker]] and how to use it to run your wiki.
+  
+** A few words on docker
+
+   I'll try to explain docker with as little technical details possible.
+   
+   Imagine the following use cases:
+
+   - You want to run an application without installing it locally.
+     Why ?
+     - To quickly try out the application
+     - To use a different version of the application you have currently installed.
+     - To avoid having to deal with installing required software
+     - Security related reasons
+   - You want to run application that is not installable on your Operating System.
+   - You want to package multiple binaries / apps and configuration in a single bundle.
+   - You want something like a virtual machine, but:
+     - Easier to create
+     - Smaller
+     - With faster startup
+
+  So, [[https://www.docker.com/][docker]] is a possible solution for the use cases described above.
+ 
+  
+** Running mdwiki via docker
+
+   If you already have [[https://www.docker.com/][docker]] installed on your machine and don't fancy dealing with how to install a webserver to run your wiki, look no futher.
+
+   #+begin_src sh
+     docker run -d -p 80:8080 -v ~/wiki:/wiki iocanel/http-server:09.2021 /wiki
+   #+end_src
+
+   #+RESULTS:
+   : 4e54c6f2aec97b81c624fc22d339f5e175c0da08aca939a25234bc6acdae6b80
+  
+   Just open your browser at `http://localhost` and you should be good to go.
+
+* Using your wiki
+
+From this point on you can start using your wiki and fill it with notes.
+
+I won't spent time explaining the sytax. I've already provided a links to guides [[https://en.wikipedia.org/wiki/Markdown][markdown]] docs. (every occurance [[https://en.wikipedia.org/wiki/Markdown][markdown]] is a link to https://www.markdownguide.org/).
+I also use from time to time this [[https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf][cheatsheet]]. In any case, the syntax is pretty trivial and this is why its recommended.
+
+You will be able to catch up with syntax pretty fast, but it might take you a while before you find how to best organize your notes.
+
+I found that what works best for me is to keep each note as small and focused as possible. This allows me to better link pieces together in meanigful way.
+Have a look at my demo [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki/wiki/index.md][wiki]] to get ideas, or even use it as a starting template for your wiki.
+
+Also, I am really interested in knowing if how you organize your notes, so feel free to reach out to me and share your experiences, either by commenting, email etc.
+
+* Post index
+
+- 01. Hackers guide to Jiu Jitsu: intro [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-01-intro][github version]]
+- 02. Hackers guide to Jiu Jitsu: ffmpeg [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-ffmpeg][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-02-ffmpeg][github version]]
+- 03. Hackers guide to Jiu Jitsu: mplayer [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-mplayer][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-03-mplayer][github version]]
+- 04. Hackers guide to Jiu Jitsu: markdown wiki [[https://iocanel.com/2021/08/hackers-guide-to-jiu-jitsu-markdown-wiki][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-04-markdown-wiki][github version]]
+- 05. Hackers guide to Jiu Jitsu: flowcharts [[https://iocanel.com/2022/01/hackers-guide-to-jiu-jitsu-flowcharts][wordpress version]] [[https://github.com/iocanel/blog/tree/master/hackers-guide-to-jiu-jitsu-05-flowcharts][github version]]
+
+
+# ./hackers-guide-to-jiu-jitsu.png https://iocanel.com/wp-content/uploads/2021/10/hackers-guide-to-jiu-jitsu.png
+# ./Boromir-Juji-Gatame.jpg https://iocanel.com/wp-content/uploads/2021/10/Boromir-Juji-Gatame.jpg

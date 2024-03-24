@@ -1,0 +1,409 @@
+#+BLOG: iocanel.com
+#+ORG2BLOG:
+#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
+#+TITLE: Using Quarkus with the Service Binding Operator
+#+DESCRIPTION: A quick walkthrough on how to use Quarkus with the Service Binding Operator
+#+CATEGORY: Hints, Cloud, Development
+#+TAGS: Java, Quarkus, Kubernetes
+
+ 
+* Introduction
+
+  [[https://kubernetes.io][Kubernetes]] is around for almost 7 years now!
+  Ever since the beggining there have been efforts to make consuming / binding to services simpler.
+  And while discovering the actual service is not so much of an issue
+  (if you employ a set of conventions), getting the credentials etc is slightly trickier.
+
+  The [[https://svc-cat.io][Service Catalog]] has been an effort that promised to simplify provisioning and binding to
+  services, but it seems that it has lost its momentum. 
+  The lack of uniformity between providers, the differences in how each service communicated
+  the binding information and the fact that people tend to favor operators for provisioning services
+  made it pretty hard to use in practice.
+
+  The [[https://github.com/redhat-developer/service-binding-operator][Service Binding Operator]] is a more recent and modern initiative.
+  It stays out of the way of service provisioning (leaving that to operators) and
+  focuses on how to best communicate the binding information to the application.
+  An interesting part of the specification is the [[https://github.com/servicebinding/spec#workload-projection][workload projection]], which defines a directory
+  structure that will be mounted to the application container when the binding happens in order to
+  pass all the required binding information:
+
+  - type
+  - uri
+  - credentials
+
+  Other parts of the specification are related to the `ServiceBinding` resource (which controls what
+  services are bound to which application and how).
+  
+  [[https://quarkus.io/][Quarkus]] already supports the [[https://github.com/servicebinding/spec#workload-projection][workload projection]] part of the spec and recently received enhancments
+  on the binding part, which is going to be the focus of this post.
+  In particular this post is going to discuss how the `ServiceBinding` can be automatically
+  genenerated for the user and will walk you through the whole process from installing the needed
+  operators to configuring and deploying the application.
+
+  For the shake of this post we are going to use [[https://kind.sigs.k8s.io/][kind]] install the [[https://github.com/redhat-developer/service-binding-operator][Service Binding Operator]] and
+  the [[https://github.com/CrunchyData/postgres-operator][Crunchy data operator for Postgres]].
+  Then, we are going to create a postgres cluster and finally we will create a simple todo application,
+  deploy and bind it to the provisioned postgres.
+ 
+  
+* Start a new kind cluster
+
+  If you've already created one, or don't use [[https://kind.sigs.k8s.io/][kind]] at all, feel free to skip.
+
+  #+begin_src sh
+  kind create cluster
+  #+end_src
+
+* Install the OLM
+
+  Both operators that will be installed in this post, will be installed through the [[https://operatorhub.io][Operatorhub]]. 
+  So, the first step is to install the [[https://olm.operatorframework.io/][Operator Lifecycle Manager]].  
+
+  #+begin_src sh
+  curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.19.1/install.sh | bash -s v0.19.1
+  #+end_src
+
+* Install the Service Binding Operator
+   
+  #+begin_src sh
+  kubectl create -f https://operatorhub.io/install/service-binding-operator.yaml
+  #+end_src
+
+  To verify the installation execute the following command.
+
+  #+begin_src sh
+    kubectl get csv -n operators -w
+  #+end_src
+
+  When the `phase` of the [[https://github.com/redhat-developer/service-binding-operator][Service Binding Operator]]  is `Succeeded` you may proceed to the next step.
+   
+* Install the Postgres Crunchy Operator
+
+  #+begin_src sh 
+  kubectl create -f https://operatorhub.io/install/postgresql.yaml
+  #+end_src
+
+  As above to verify the installation execute:
+
+  #+begin_src sh
+    kubectl get csv -n operators -w
+  #+end_src
+
+  When the `phase` of the operator is `Succeeded` you may proceed to the next step.
+
+
+* Create a Postgres cluster
+
+   We shall create a new namespace, where we will install our cluster and application:
+
+   #+begin_src sh 
+     kubectl create ns demo
+     kubectl config set-context --current --namespace=demo
+   #+end_src
+
+
+   To create the cluster we need to apply the following custom resource:
+
+   #+begin_src yaml :tangle ~/pg-cluster.yml
+     apiVersion: postgres-operator.crunchydata.com/v1beta1
+     kind: PostgresCluster
+     metadata:
+       name: pg-cluster
+       namespace: demo
+     spec:
+       image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-ha:centos8-13.4-0
+       postgresVersion: 13
+       instances:
+         - name: instance1
+           dataVolumeClaimSpec:
+             accessModes:
+             - "ReadWriteOnce"
+             resources:
+               requests:
+                 storage: 1Gi
+       backups:
+         pgbackrest:
+           image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:centos8-2.33-2
+           repos:
+           - name: repo1
+             volume:
+               volumeClaimSpec:
+                 accessModes:
+                 - "ReadWriteOnce"
+                 resources:
+                   requests:
+                     storage: 1Gi
+           - name: repo2
+             volume:
+               volumeClaimSpec:
+                 accessModes:
+                 - "ReadWriteOnce"
+                 resources:
+                   requests:
+                     storage: 1Gi
+       proxy:
+         pgBouncer:
+           image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbouncer:centos8-1.15-2
+   #+end_src
+
+   This resource has been borrowed from [[https://redhat-developer.github.io/service-binding-operator/userguide/getting-started/quick-start.html][Service Binding Operator Quickstart]], which is
+   definitely something worth looking into (if you haven't already).
+
+   Let's save that file under `pg-cluster.yml` and apply it using `kubectl`
+
+   #+begin_src sh
+     kubectl apply -f ~/pg-cluster.yml
+   #+end_src
+
+   Let's check the pods to verify the installation:
+
+   #+begin_src sh
+   kubectl get pods -n demo
+   #+end_src
+
+** Create a Quarkus application that will bind to Postgres
+
+   The application we are going to create is going to be a simple `todo` application that will
+   connect to postgres via hibernate and panache.
+
+   The application that we will create is heavily inspired by [[https://github.com/cescoffier/quarkus-todo-app][Clement Escoffier's Quarkus TODO app]],
+   but will focus less on the presentation and more on the binding aspect.
+
+   We will generate the application using the following maven command.
+   
+   #+begin_src sh
+     mkdir -p ~/demo
+     cd ~/demo
+     mvn io.quarkus.platform:quarkus-maven-plugin:2.5.0.Final:create -DprojectGroupId=org.acme -DprojectArtifactId=todo-example -DclassName="org.acme.TodoResource" -Dpath="/todo"
+     cd todo-example
+   #+end_src
+
+   The next step is to add all required extensions for connecting to postgres, generating all required
+   kubernetes resources and building the a container image for our application using docker.
+   
+   #+begin_src sh :dir "~/demo/todo-example"
+   ./mvnw quarkus:add-extension -Dextensions="resteasy-jackson,jdbc-postgresql,hibernate-orm-panache,kubernetes,kubernetes-service-binding,container-image-docker"
+   #+end_src
+
+   At this point we need to create a simple entity:
+
+   #+begin_src java :mkdirp yes :tangle "~/demo/todo-example/src/main/java/org/acme/Todo.java" 
+     package org.acme;
+
+     import javax.persistence.Column;
+     import javax.persistence.Entity;
+
+     import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+     @Entity
+     public class Todo extends PanacheEntity {
+
+         @Column(length = 40, unique = true)
+         public String title;
+
+         public boolean completed;
+
+         public Todo() {
+         }
+
+         public Todo(String title, Boolean completed) {
+             this.title = title;
+         }
+     }
+   #+end_src
+
+   And expose that via rest:
+
+   #+begin_src java :mkdirp yes :tangle "~/demo/todo-example/src/main/java/org/acme/TodoResource.java"
+     package org.acme;
+
+     import javax.transaction.Transactional;
+     import javax.ws.rs.*;
+     import javax.ws.rs.core.Response;
+     import javax.ws.rs.core.Response.Status;
+     import java.util.List;
+
+     @Path("/todo")
+     public class TodoResource {
+
+         @GET
+         @Path("/")
+         public List<Todo> getAll() {
+           return Todo.listAll();
+         }
+
+         @GET
+         @Path("/{id}")
+         public Todo get(@PathParam("id") Long id) {
+             Todo entity = Todo.findById(id);
+             if (entity == null) {
+                 throw new WebApplicationException("Todo with id of " + id + " does not exist.", Status.NOT_FOUND);
+             }
+             return entity;
+         }
+
+         @POST
+         @Path("/")
+         @Transactional
+         public Response create(Todo item) {
+             item.persist();
+             return Response.status(Status.CREATED).entity(item).build();
+         }
+
+         @GET
+         @Path("/{id}/complete")
+         @Transactional
+         public Response complete(@PathParam("id") Long id) {
+             Todo entity = Todo.findById(id);
+             entity.id = id;
+             entity.completed = true;
+             return Response.ok(entity).build();
+         }
+
+
+         @DELETE
+         @Transactional
+         @Path("/{id}")
+         public Response delete(@PathParam("id") Long id) {
+             Todo entity = Todo.findById(id);
+             if (entity == null) {
+                 throw new WebApplicationException("Todo with id of " + id + " does not exist.", Status.NOT_FOUND);
+             }
+             entity.delete();
+             return Response.noContent().build();
+         }
+     }
+   #+end_src
+
+****  Bind to the target Postgres cluster
+
+     In order to bind the postgres service to our application we need to either provide a `ServiceBidning` resource or have it generated.
+     To have the binding generated for us we need to provide the service coordinates:
+   
+     - apiVersion: `postgres-operator.crunchydata.com/v1beta1`
+     - kind: `PostgresCluster`
+     - name: `pg-cluster`
+
+       prefixed with `quarkus.kubernetes-service-binding.services.<id>.` as shown below:
+
+     #+begin_src text 
+       quarkus.kubernetes-service-binding.services.my-db.api-version=postgres-operator.crunchydata.com/v1beta1
+       quarkus.kubernetes-service-binding.services.my-db.kind=PostgresCluster
+       quarkus.kubernetes-service-binding.services.my-db.name=pg-cluster
+     #+end_src
+
+     The `id` is just used to group properties together and can be anything.
+
+     In addition to the configuration above we also need to configure the datasource:
+     
+     #+begin_src text 
+       quarkus.datasource.db-kind=postgresql
+       quarkus.hibernate-orm.database.generation=drop-and-create
+       quarkus.hibernate-orm.sql-load-script=import.sql
+     #+end_src
+
+     Finally, we will use `IfNotPresent` as image pull policy since we are not pushing our
+     image to a registry and we just load it to the cluster.
+
+     #+begin_src text
+      quarkus.kubernetes.image-pull-policy=IfNotPresent
+    #+end_src
+
+    So, the application.properties file should look like:
+    
+     #+begin_src text :mkdirp yes :tangle  "~/demo/todo-example/src/main/resources/application.properties"
+       quarkus.kubernetes-service-binding.services.my-db.api-version=postgres-operator.crunchydata.com/v1beta1
+       quarkus.kubernetes-service-binding.services.my-db.kind=PostgresCluster
+       quarkus.kubernetes-service-binding.services.my-db.name=pg-cluster
+
+       quarkus.datasource.db-kind=postgresql
+       quarkus.hibernate-orm.database.generation=drop-and-create
+       quarkus.hibernate-orm.sql-load-script=import.sql
+
+       quarkus.kubernetes.image-pull-policy=IfNotPresent
+    #+end_src
+
+    Now, let's create an import sql script with some intial data.
+
+     #+begin_src sql :tangle  "~/demo/todo-example/src/main/resources/import.sql"
+       INSERT INTO todo(id, title, completed) VALUES (nextval('hibernate_sequence'), 'Finish the blog post', false);
+     #+end_src
+   
+* Prepare for deployment
+
+  To deploy, we need to perform a container image build, load the image to our cluster
+  (remember we are using [[https://kind.sigs.k8s.io/][kind]]), generate the resource and perform the deployment.
+   
+**** Build the container image
+
+     To build the container image, you can use:
+    
+     #+begin_src sh :dir ~/demo/todo-example
+       mvn clean install -Dquarkus.container-image.build=true -DskipTests 
+     #+end_src
+
+     This assumes that you have docker up and running.
+
+**** Load the docker image to the cluster
+
+     #+begin_src sh
+     kind load docker-image iocanel/todo-example:1.0.0-SNAPSHOT
+     #+end_src
+
+***** Loading the image on minikube     
+     
+      If you are using [[https://minikube.sigs.k8s.io/docs/start/][minikube]] instead, then execute:
+       #+begin_src sh
+     eval $(minikube docker-env)
+     #+end_src
+
+      and re-build the image.
+
+     When using tools like [[https://kind.sigs.k8s.io/][kind]] or [[https://minikube.sigs.k8s.io/docs/start/][minikube]], it is generally a good idea to change the image
+     pull policy to `IfNotPresent` to avoid uneeded pulls, since most of the time the image
+     will be loaded from the local docker daemon, as shown above.
+     To set the image pull policy, we set `quarkus.kubernetes.image-pull-policy=IfNotPresent`
+     as already shown above.
+     
+
+* Deploy the application
+
+  The next step will generate the deployment manifest, including the `ServiceBinding` and will apply
+  them on kubernetes.
+     
+  #+begin_src sh :dir ~/demo/todo-example
+    mvn clean install -Dquarkus.kubernetes.deploy=true -DskipTests 
+  #+end_src
+
+  To verify everything is up and running:
+  
+   #+begin_src sh
+   kubectl get pods -n demo -w
+   #+end_src
+
+
+* Verify the installation
+
+  The simplest way to verify that everything works as expected is to port forward to http port
+  locally and access the `/todo` endpoint:
+
+  #+begin_src sh
+    kubectl port-forward service/todo-example 8080:80
+  #+end_src
+
+  Open your browser on [[http://localhost:8080/todo]] and enjoy!
+
+* Thoughts and future steps     
+
+  I am really excited with the progress on the Service binding front. Thinks are looking great and
+  can look even better.
+  Some potential improvements I can see coming in the near future, is reducing the amount of needed
+  configuration, with the use of smart conventions (e.g. assuming that custom resource name is the i
+  same as the database name unless explicitly specified) and a reasonable set of defaults
+  (e.g. assuming that for postgres the default operator is [[https://github.com/CrunchyData/postgres-operator][CrunchyData operator]]).
+  This could even allow us to bind to services with zero config, without really sacrificing in
+  flexibility and customizability!
+
+  I hope I could get you even half as excited as I am!
+  
+* The end
