@@ -2,18 +2,80 @@
 
 # A script that organizes org files for ox-hugo export based on their date and title
 # Each blog post is a readme.org file. The date and title should be extracted from the org metadata
-# The resulting format shoud be YYYY/MM/DD/title/ and it should contain the readme.org and all files found in the original folder
+# The resulting format should be YYYY/MM/DD/title/ and it should contain the readme.org and all files found in the original folder
 
+dry_run=false
+target_dir=.
+for arg in "$@"; do
+    if [ "$arg" == "--dry-run" ]; then
+        dry_run=true
+    elif [[ "$arg" == "--target-dir="* ]]; then
+        target_dir="${arg#*=}"
+    fi
+done
+
+# A function that extracts the date from an org file
+function get_date() {
+    file=$1
+    if [ ! -f "$file" ]; then
+        return
+    fi
+    date=$(grep -i "#+date" "$file" | awk '{print $2}' | tr -d '[]' | sed 's/-/\//g')
+    if [ -z "$date" ]; then
+        date="Unsorted"
+    fi
+    echo "$date"
+}
+
+# A function that extracts the title from an org file
+function get_title() {
+    file=$1
+    dir=$(dirname "$file")
+    if [ ! -f "$file" ]; then
+        return
+    fi
+    title=$(grep -i "#+title" "$file" | sed 's/#+title: //i')
+    if [ -z "$title" ]; then
+        title=$(basename "$dir" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+    fi
+    echo "$title"
+}
 
 # Get the list of org files
-files=$(find . -name "readme.org")
-
+files=$(find . -name "readme.org" | sort)
+rm toc.md
 # For each file
-for file in $files; do
-    # Get the date and title
-    date=$(grep -i "#+date" $file | awk '{print $2}' | tr -d '[]' | sed 's/-/\//g')
-    title=$(grep -i "#+title" $file | sed 's/#+title: //i')
-    target=$(echo $date/$title | sed 's/ /\\ /g')
-    mkdir -p $target
-    cp -r $(dirname $file)/* $target
+while IFS= read -r file; do
+    echo "Processing $file"
+    dir=$(dirname "$file")
+    date=$(get_date "$file")
+    title=$(get_title "$file")
+    target="$target_dir/$date/$title"
+    if [ -z "$title" ]; then
+      continue
+    fi
+    if [ "$dry_run" = true ]; then
+        echo "mkdir -p \"$target\""
+        echo "cp -r \"$dir\"/* \"$target\""
+        echo "$target_dir/$date/$title/readme.org" >> toc.md
+        continue
+    fi
+    mkdir -p "$target" || { echo "Error: Unable to create directory $target"; exit 1; }
+    cp -r "$dir"/* "$target" 2> /dev/null 
+    echo "$target_dir/$date/$title/readme.org" >> toc.md
+done < <(find . -name "readme.org")
+
+# Generate the README.md file
+cat header.md > README.md
+cat toc.md | sort | uniq | while read file; do
+    title=$(get_title "$file")
+    if [ -z "$title" ]; then
+      continue
+    fi
+    if [ "$dry_run" = true ]; then
+      echo "- [$title]($file)"
+    else
+      echo "- [$title]($file)" >> README.md
+    fi
 done
+exit 0
