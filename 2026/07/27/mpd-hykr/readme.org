@@ -27,7 +27,13 @@ There was a second thing pushing me away, and it took me a while to name it. I u
 
 After almost nine years on i3, I moved to [[https://hyprland.org][Hyprland]].
 
-Hyprland gave me something i3 never did. I can control my media from any workspace, regardless of the source. It also lets me switch between sources. The interface is simple, and to be honest it reminded me of the plain old MP3 players I used to use back in the day.
+Hyprland gave me something i3 never did. On [[https://github.com/Jas-SinghFSU/HyprPanel][~hyprpanel~]] there is a media control that shows whatever is playing right now, with the usual buttons and a seek bar.
+
+[[./hyprpanel-media-control.png]]
+
+The part that matters is that it does not care about the source. A movie in ~mpv~, a YouTube video in the browser, music on Spotify, they all land in the same control. And when more than one thing is playing, it lets me switch between them. So I can pause whatever is making noise from any workspace, without going to find the program that started it.
+
+The interface is simple, and to be honest it reminded me of the plain old MP3 players I used to use back in the day.
 
 That is when it hit me.
 
