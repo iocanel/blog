@@ -1,4 +1,4 @@
-#+TITLE: Winamp, but for my window manager
+#+TITLE: Playing music on Hyprland like it's the 2000s
 #+AUTHOR: Ioannis Canellos
 #+DATE: 2026-07-27
 #+CATEGORIES:
