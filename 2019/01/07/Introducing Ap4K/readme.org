@@ -6,6 +6,7 @@
 #+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil
 #+TITLE: Introducing Ap4K
 #+DESCRIPTION: An introduction post for Ap4k
+#+HUGO_ALIASES: /2019/01/ap4k-pt1-introdcution/
 #+CATEGORY: Development
 #+TAGS: Kubernetes Openshift Java
 
