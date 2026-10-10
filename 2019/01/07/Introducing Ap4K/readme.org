@@ -7,8 +7,8 @@
 #+TITLE: Introducing Ap4K
 #+DESCRIPTION: An introduction post for Ap4k
 #+HUGO_ALIASES: /2019/01/ap4k-pt1-introdcution/
-#+CATEGORY: Development
-#+TAGS: Kubernetes Openshift Java
+#+CATEGORIES: development
+#+TAGS: java kubernetes openshift dekorate
 
 * Prologue
 
