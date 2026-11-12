@@ -7,13 +7,13 @@
 
 * Prologue
 
-I wrote an MCP server to talk to my issue tracker. The point was to give the assistant a clean, typed way in, instead of leaving it to improvise.
+I wrote an MCP server to talk to a service. The point was to give the assistant a clean, typed way in, instead of leaving it to improvise.
 
-Most of the time it was invoked. Sometimes it resorted to ~curl~ against the tracker's API. Occasionally it went looking for a local CLI tool instead. Same task, three different routes.
+Most of the time it was invoked. Sometimes it resorted to ~curl~ against the service's API. Occasionally it went looking for a local CLI tool instead. Same task, three different routes.
 
 Another case where Claude does its own thing. My context files say where things live on my machine, specifically so nothing has to be looked up. And yet Claude often runs ~find~ across my home directory, hunting for a path that was sitting in the file it had just loaded.
 
-Neither is catastrophic, it is just a waste of time and tokens. The job still gets done, which is what makes these insidious: the output looks fine, so you only notice if you happen to be watching the tool calls.
+Neither is catastrophic. Both just waste time and tokens. The job still gets done, which is what makes these insidious: the output looks fine, so you only notice if you happen to be watching the tool calls.
 
 Now my configuration changes almost daily. A rule here, a new skill there, a file moved. It has no compiler, no type checker, and no runtime error when it stops working, so I have been breaking things without noticing.
 
@@ -21,7 +21,7 @@ At some point the conclusion was obvious. This is a software project. It has sou
 
 * What I actually want to test
 
-To be clear about the target: I am *not* testing the model. I am testing *my configuration*. The model is a constant. My configuration is the variable, and it changes every day. Three questions:
+To be clear about the target: I am *not* testing the model. I am testing *my configuration*. The model is not what I am iterating on. My configuration is, and it changes every day. Three questions:
 
 - *Recall.* Is a fact from my context files actually retrieved, without going and looking for it?
 - *Routing.* When a task matches a skill or an MCP server I built, does that thing get used, or does the assistant improvise with ~curl~ and ~find~?
@@ -31,23 +31,22 @@ To be clear about the target: I am *not* testing the model. I am testing *my con
 
 The obvious next step was to find an existing tool. There is a healthy ecosystem here and I did not want to write another one.
 
-The most common answer is [[https://www.promptfoo.dev][promptfoo]], a general-purpose testing framework for LLMs, and it is genuinely good. It even has a native Claude Code provider that exposes every tool call, which is most of what I need. But that provider goes through the API, so it bills API credits and does not use my subscription. /Edit: I found a way to create a provider that can use the subscription after all, and that might be the subject of a future post./
-Other tools out there like DeepEval, Inspect AI and Ragas grade *answer quality*, which is a different question from whether my file loaded.
+The most common answer is [[https://www.promptfoo.dev][promptfoo]], a general-purpose testing framework for LLMs, and it is genuinely good. It even has a native Claude Code provider that exposes every tool call, which is most of what I need. But that provider goes through the API, so it bills API credits instead of using my subscription. I later found a way to build a provider that uses the subscription, but that is a subject for a future post.
 
-So I wrote my own: a small tool over ~claude -p~, which runs headless against my normal session and costs me nothing extra.
+DeepEval and Ragas grade *answer quality*, which is a different question from whether my file loaded. Inspect AI can drive agents, Claude Code included, but that means rebuilding my environment inside a general eval framework. I wanted something smaller: my real configuration, on my subscription, in a few lines of YAML.
 
-The purpose of this post is not to advertise my work, after all, I did not even write the code. The purpose is to highlight that the agent configuration should be treated like any other software project, with version control, tests and the rest. I happen to use Claude Code, so that is what the examples show, but nothing here is specific to it. Swap in [[https://opencode.ai][OpenCode]], [[https://github.com/openai/codex][Codex]] or [[https://antigravity.google][Antigravity]], and the problem is the same: instruction files you cannot verify, and tools you cannot prove got used. Do not get fooled by the use of natural language. You are still programming, using a broader language that runs on a non-deterministic machine. Use your software engineering skills wisely.
+This post is not about the tool. Agent configuration is software, and it deserves version control, tests and the rest. I use Claude Code, so that is what the examples show, but nothing here is specific to it. Swap in [[https://opencode.ai][OpenCode]], [[https://github.com/openai/codex][Codex]] or [[https://antigravity.google][Antigravity]], and the problem is the same: instruction files you cannot verify, and tools you cannot prove got used. Do not get fooled by the natural language. You are still programming, in a broader language, on a non-deterministic machine.
 
 * The testing tool
 
-I wanted the tests to follow the given/when/then pattern and be written in a readable YAML DSL. So, after deciding on the structure, the rest was easy. I built a simple tool called [[https://github.com/iocanel/cctest][cctest]] (not my best naming moment, but feel free to suggest a better one). It is small on purpose, and it does one thing: run prompts against your real configuration and assert on what came back, including *how* it came back.
+I wanted the tests to follow the given/when/then pattern and be written in a readable YAML DSL. So I built a simple tool called [[https://github.com/iocanel/cctest][cctest]]. It runs ~claude -p~ headless against my normal session, so it costs nothing extra. It is small on purpose, and it does one thing: run prompts against your real configuration and assert on what came back, including *how* it came back.
 
-Here's a test 'Getting the music library path should not use tools':
+Here is a test checking that the music library path is answered without touching any tools:
 
 #+begin_src yaml
 - name: music library path
   given:
-    project: ~
+    project: "~"
   when: where does my music live?
   then:
     - contains: ~/Documents/Music
@@ -56,11 +55,11 @@ Here's a test 'Getting the music library path should not use tools':
     - no_tools
 #+end_src
 
-Given, when, then. The part of ~given~ that matters most is which directory the session runs in, because that determines which instruction files load.
+The part of ~given~ that matters most is which directory the session runs in, because that determines which instruction files load.
 
 ~no_tools~ is the one doing the real work: the test fails if the assistant touched a single tool, even when the answer is correct.
 
-For routing, we can assert that a specific skill or MCP server was used 'When I ask for my open Jira tasks, the Jira MCP server should be used':
+For routing, we can assert that a specific skill or MCP server was used. Asking for my open Jira tasks must go through the Jira MCP server:
 
 #+begin_src yaml
 - name: jira tasks go through the jira server
@@ -84,17 +83,15 @@ And for restrictions, the assertion is that something never happened.
         - tool_used: {Grep: {path: ~/workspace/acme.com/**}}
 #+end_src
 
-My rule says that repository is never read directly, because reading it would violate the client's policy.
-
 ** The grammar
 
 Assertions form a small tree: leaves for text (~contains~, ~matches~, ~similar~), for behaviour (~no_tools~, ~tool_used~, ~skill_used~, ~mcp_used~), and for registration (~skill_available~, ~mcp_available~), composed with ~all~, ~any~ and ~none~. A bare list means AND, so the common case stays short.
 
-Only one design note is worth the space. ~none~ is deliberately not called ~not~, because ~not: [a, b]~ reads as "not (a and b)", which is satisfied when only one matches, and that is never what anyone means. MongoDB shipped a separate ~$nor~ for this exact reason and Elasticsearch has ~must_not~. When two independent systems converge on the same workaround, copy it rather than rediscover it.
+~none~ is deliberately not called ~not~, because ~not: [a, b]~ reads as "not (a and b)", which passes when only one matches. That is never what anyone means.
 
 * A brief demo
 
-Fair question at this point: does it catch anything, or is it 28 green checks that would stay green no matter what I broke? A suite that has never failed is indistinguishable from one that cannot fail. So I broke it on purpose, editing my context file so the music section points at ~~/Music~ instead.
+Fair question at this point: does it catch anything, or is it 28 green checks that would stay green no matter what I broke? So I broke it on purpose, editing my context file so the music section points at ~~/Music~ instead.
 
 #+begin_example
 FAIL [0/3] music library path
@@ -107,7 +104,7 @@ FAIL [0/3] music library path
 
 Zero out of three runs, and the tree showing exactly which branch broke. Restore the file and it goes back to three out of three, with the neighbouring tests green throughout.
 
-Look at the last line though. ~no_tools~ *passed*. It still answered straight from context, without checking anything. It was not confused. It was certain, and certain of the wrong thing. And it did not even give the wrong path plainly. It said *"Two spots"* and listed both, hedging its way around the contradiction I had just introduced. Which is worse than being wrong, because it reads as thorough.
+Look at the last line though. ~no_tools~ *passed*. It still answered straight from context, without checking anything. It was not confused. It was certain, and certain of the wrong thing.
 
 * The parts that bit me
 
@@ -115,7 +112,7 @@ Three things I got wrong, all worth knowing before you build something similar.
 
 *My assertions were the bug, not my config.* Every red test during development was my own fault. I wrote "must not contain ~curl~", forgetting that a correct answer mentions it in order to rule it out: "I used the jira tool rather than calling the API with ~curl~". So assert on stable anchors. Paths, commands, identifiers. Things with exactly one correct surface form.
 
-*A test result is not a boolean.* I ran the suite five times and got three passes and two failures on identical input. Output is not deterministic even at temperature zero, and there is no seed parameter. So, it might make sense to run each case multiple times and define a pass threshold. Again, something to explore in a future post.
+*A test result is not a boolean.* I ran the suite five times and got three passes and two failures on identical input. Output is not deterministic even at temperature zero, and there is no seed parameter. That is why cctest runs each case several times, which is where the 0/3 in the demo comes from. What it does not have yet is a pass threshold per case. A restriction should fail on a single violation, while a recall test might tolerate one miss out of five. Again, something to explore in a future post.
 
 *A negative assertion can be trivially true.* I have a rule that a client repository under ~~/workspace/acme.com~ is never read directly, only through scripts, because reading it would violate their policy. The test asserts that no ~Read~ or ~Grep~ touched that path, and it passed. It would also have passed in a session where nothing happened at all. It needed a positive assertion next to it, checking the repository really was accessed, by script. A test that cannot fail is worse than no test.
 
@@ -128,5 +125,3 @@ There is a gap. Every test asks a direct question, which is the easy case. Rules
 Still, it is more than I had. Before this, every claim about my configuration was a guess. Now it is *knowable*.
 
 You do not need a tool to start. Ask your assistant something that sits in your context files and watch whether it reaches for ~find~. If it does, you just found the first bug in software you did not know you were writing.
-
-Enjoy!
