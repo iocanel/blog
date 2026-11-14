@@ -1,0 +1,176 @@
+#+TITLE: Using promptfoo to test Claude Code configuration
+#+AUTHOR: Ioannis Canellos
+#+DATE: 2026-11-13
+#+CATEGORIES:
+#+TAGS: AI, Claude, testing, promptfoo, evals
+#+DESCRIPTION: Two ways to test a Claude Code configuration with promptfoo on a subscription: the built-in Agent SDK provider and a small custom one.
+
+* Prologue
+
+In my [[https://iocanel.com/2026/08/treat-your-agent-configuration-like-software/][previous post]], I experimented with implementing a poor man's testing tool for my Claude Code configuration. One option I explored while researching the space was [[https://www.promptfoo.dev][promptfoo]]. At the time of the initial research, promptfoo did support Claude Code as a provider, but with a catch. It only supported API billing, which was undesirable in my case.
+
+In this post, I will explore the options for using promptfoo with Claude Code and a subscription:
+
+- Use ~anthropic:claude-agent-sdk~ through a local Claude Code login, with ~apiKeyRequired: false~ (Option 1).
+- Implement a custom provider (Option 2).
+
+* The setup
+
+Everything lives in one folder:
+
+#+begin_example
+promptfoo-tests/
+├── tests.yaml       the test, shared by both options
+├── builtin.yaml     option 1: the built-in provider
+├── custom.yaml      option 2: the custom provider
+└── claude_cli.py    option 2: the provider code
+#+end_example
+
+promptfoo and the Agent SDK get installed in the same folder:
+
+#+begin_src sh
+npm init -y
+npm install promptfoo @anthropic-ai/claude-agent-sdk
+#+end_src
+
+* The test
+
+I am reusing the music library example from the previous post. My context says the library lives in ~~/Documents/Music~. Asking for it should need no tools at all. This is ~tests.yaml~:
+
+#+begin_src yaml
+- description: music library path comes from context, no tools
+  vars:
+    question: what's the root path to my music library?
+  assert:
+    - type: icontains
+      value: ~/Documents/Music
+    - type: javascript
+      value: |
+        const calls = context.providerResponse?.metadata?.toolCalls ?? [];
+        const pass = calls.length === 0;
+        return { pass, score: pass ? 1 : 0, reason: `used tools: ${calls.map(c => c.name)}` };
+#+end_src
+
+- ~icontains~ checks the answer.
+- The ~javascript~ assertion checks *how* the answer was produced. It reads the tool calls that the provider reports.
+
+Both options run this same file.
+
+* Option 1: the built-in provider
+
+This is ~builtin.yaml~:
+
+#+begin_src yaml
+prompts: ["{{question}}"]
+providers:
+  - id: anthropic:claude-agent-sdk
+    config:
+      apiKeyRequired: false
+      working_dir: /home/iocanel
+      setting_sources: ['user', 'project', 'local']
+tests: file://tests.yaml
+#+end_src
+
+- ~apiKeyRequired: false~ skips the API key check, and the SDK uses my Claude Code login.
+- ~working_dir~ is the directory the session runs in.
+- ~setting_sources~ loads ~CLAUDE.md~ and my settings. By default it loads neither.
+- ~prompts~ and ~tests~ tie the provider to the question in ~tests.yaml~.
+
+To run it:
+
+#+begin_src sh
+npx promptfoo eval -c builtin.yaml --no-cache
+#+end_src
+
+~--no-cache~ matters. Without it promptfoo may replay a cached answer, and a configuration change goes unnoticed.
+
+* Option 2: a custom provider
+
+A promptfoo Python provider is a file with a ~call_api~ function. Mine runs ~claude -p~ and collects every tool call along the way. This is ~claude_cli.py~:
+
+#+begin_src python
+import json
+import os
+import subprocess
+
+
+def call_api(prompt, options, context):
+    # prompt:  the rendered prompt, here the question of the test
+    # options: the provider entry from the YAML, its config block is options["config"]
+    # context: the test case, its variables are context["vars"]
+    cwd = os.path.expanduser(options["config"].get("cwd") or "~")
+    command = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose"]
+    completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
+
+    answer, tool_calls = "", []
+    for line in completed.stdout.splitlines():
+        event = json.loads(line)
+        if event["type"] == "assistant":
+            tool_calls += [b for b in event["message"]["content"] if b["type"] == "tool_use"]
+        elif event["type"] == "result":
+            answer = event["result"]
+
+    # Returns a dict. "output" is what text assertions see.
+    # "metadata" is what javascript assertions see.
+    # On failure, return {"error": "..."} instead.
+    return {"output": answer, "metadata": {"toolCalls": tool_calls}}
+#+end_src
+
+The built-in provider reports tool calls under the same ~metadata.toolCalls~ key, which is why one test file works for both.
+
+~custom.yaml~ points to the provider file:
+
+#+begin_src yaml
+prompts: ["{{question}}"]
+providers:
+  - id: file://claude_cli.py
+    config:
+      cwd: "~"
+tests: file://tests.yaml
+#+end_src
+
+To run it:
+
+#+begin_src sh
+npx promptfoo eval -c custom.yaml --no-cache
+#+end_src
+
+* The results
+
+I ran the test three times against each, with ~ANTHROPIC_API_KEY~ unset. The last row is the same test in cctest, the tool from the previous post, with tools available:
+
+| Provider                         | Passed | Tool calls | Time per run |
+|----------------------------------+--------+------------+--------------|
+| Built-in, with ~setting_sources~ | 3 of 3 | 0          | 5 to 6s      |
+| Built-in, defaults               | 0 of 3 | 6 to 15    | 36 to 66s    |
+| Custom (~claude~ CLI)            | 3 of 3 | 0          | 9 to 18s     |
+| cctest                           | 3 of 3 | 0          | 9 to 10s     |
+
+Both options work on my subscription, and the built-in one is faster.
+
+With the defaults it knows nothing about me. It went through my ~mpd~ and XDG configuration, answered ~~/Music~ once and gave up twice.
+
+One difference remains. The built-in provider only allows the MCP servers you configure for it, while the CLI starts everything I actually run.
+
+* The question matters
+
+In the previous post the question was "where does my music live?". One run proves little, so I used ~--repeat 3~ to run each case three times. With that wording, the same test is flaky:
+
+#+begin_example
+⚠ open question: 2/3 passed across 3 runs
+#+end_example
+
+The path was in context every time. The tool calls were not looking for it.
+
+- On Opus 5.5, the model opened the memory file behind the line that holds the path. Three times out of three.
+- On Fable 5.2, it ran ~ls~ on the directory to check that it exists. One time out of three.
+
+An open question invites more detail and a quick check. A narrow one gets the path and nothing else. If the test is about recall, ask for exactly the fact.
+
+* Closing thoughts
+
+promptfoo is meant to also work with [[https://github.com/openai/codex][Codex]] and [[https://opencode.ai][OpenCode]]. I am not sure about the status of [[https://antigravity.google][Antigravity]]. Maybe that is something we should see in a future post.
+
+Using JavaScript to check the actual response is powerful, but not ideal for people who are not that technical. This is a thing that my custom tool does better. Maybe it makes sense to rewrite my tool on top of promptfoo. That is also something worth exploring in a future post.
+
+Till next time!
